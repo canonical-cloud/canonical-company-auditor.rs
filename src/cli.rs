@@ -22,6 +22,10 @@ pub enum Command {
     Validate(ValidateArgs),
     /// Run a deterministic whole-company assessment.
     Assess(AssessArgs),
+    /// Run a dress-rehearsal or full-audit engagement.
+    Audit(AuditArgs),
+    /// Export a verified audit dossier as a complete report package.
+    Package(PackageArgs),
     /// Render a constrained AI narrative prompt from an existing report.
     Prompt(PromptArgs),
     /// Run the signed inbound assessment/webhook HTTP service.
@@ -86,6 +90,53 @@ pub struct AssessArgs {
     /// Return exit code 2 for failed findings at or above this severity; `never` disables.
     #[arg(long, default_value = "high", env = "CANONICAL_AUDITOR_ASSESS_FAIL_ON")]
     pub fail_on: String,
+}
+
+/// Dress-rehearsal or full-audit inputs and output policy.
+#[derive(Clone, Debug, Args)]
+pub struct AuditArgs {
+    /// Company manifest JSON.
+    #[arg(long, env = "CANONICAL_AUDITOR_AUDIT_MANIFEST")]
+    pub manifest: PathBuf,
+    /// Evidence bundle JSON.
+    #[arg(long, env = "CANONICAL_AUDITOR_AUDIT_EVIDENCE")]
+    pub evidence: PathBuf,
+    /// Audit engagement JSON.
+    #[arg(long, env = "CANONICAL_AUDITOR_AUDIT_ENGAGEMENT")]
+    pub engagement: PathBuf,
+    /// Optional assessment program JSON; omission uses the reviewed built-in program.
+    #[arg(long, env = "CANONICAL_AUDITOR_AUDIT_PROGRAM")]
+    pub program: Option<PathBuf>,
+    /// Dossier destination, or `-` for stdout.
+    #[arg(
+        long,
+        short,
+        default_value = "-",
+        env = "CANONICAL_AUDITOR_AUDIT_OUTPUT"
+    )]
+    pub output: String,
+    /// JSON or Markdown dossier output.
+    #[arg(
+        long,
+        value_enum,
+        default_value = "markdown",
+        env = "CANONICAL_AUDITOR_AUDIT_FORMAT"
+    )]
+    pub format: ReportFormat,
+    /// Return exit code 2 for exception controls at or above this severity; `never` disables.
+    #[arg(long, default_value = "high", env = "CANONICAL_AUDITOR_AUDIT_FAIL_ON")]
+    pub fail_on: String,
+}
+
+/// Complete report-package export settings.
+#[derive(Clone, Debug, Args)]
+pub struct PackageArgs {
+    /// Existing audit dossier JSON.
+    #[arg(long, env = "CANONICAL_AUDITOR_PACKAGE_DOSSIER")]
+    pub dossier: PathBuf,
+    /// New output directory; existing paths are refused.
+    #[arg(long, env = "CANONICAL_AUDITOR_PACKAGE_OUTPUT_DIR")]
+    pub output_dir: PathBuf,
 }
 
 /// AI prompt rendering inputs.

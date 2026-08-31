@@ -1,7 +1,7 @@
 //! Command orchestration and bounded file/stdout boundaries.
 
 use std::fmt::Write as _;
-use std::fs::{File, OpenOptions};
+use std::fs::{File, OpenOptions, create_dir};
 use std::io::{BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
@@ -10,14 +10,17 @@ use serde::de::DeserializeOwned;
 use serde_json::json;
 
 use crate::AuditError;
+use crate::audit::{AuditDossier, ControlTestStatus, run_audit};
 use crate::cli::{
-    AssessArgs, CatalogArgs, CatalogFormat, Cli, Command, PromptArgs, ReportFormat, ServeArgs,
-    ValidateArgs,
+    AssessArgs, AuditArgs, CatalogArgs, CatalogFormat, Cli, Command, PackageArgs, PromptArgs,
+    ReportFormat, ServeArgs, ValidateArgs,
 };
+use crate::engagement::AuditEngagement;
 use crate::engine::{assess, verify_report};
 use crate::model::{
     AssessmentRequest, AuditReport, CompanyManifest, EvidenceBundle, FindingStatus, Severity,
 };
+use crate::package::{build_audit_package, render_dossier_markdown};
 use crate::program::{AssessmentProgram, built_in_program};
 use crate::report::{PromptKind, render_markdown, render_prompt};
 use crate::server::{ServeConfig, run};
@@ -44,6 +47,8 @@ pub async fn execute(cli: Cli) -> Result<Exit, AuditError> {
         Command::Catalog(arguments) => catalog(&arguments),
         Command::Validate(arguments) => validate(&arguments),
         Command::Assess(arguments) => assess_command(&arguments),
+        Command::Audit(arguments) => audit_command(&arguments),
+        Command::Package(arguments) => package(&arguments),
         Command::Prompt(arguments) => prompt(&arguments),
         Command::Serve(arguments) => serve(arguments).await,
     }
@@ -110,6 +115,48 @@ fn assess_command(arguments: &AssessArgs) -> Result<Exit, AuditError> {
     })
 }
 
+fn audit_command(arguments: &AuditArgs) -> Result<Exit, AuditError> {
+    let request = read_request(&arguments.manifest, &arguments.evidence)?;
+    let engagement = read_json::<AuditEngagement>(&arguments.engagement)?;
+    let program = read_program(arguments.program.as_ref())?;
+    let dossier = run_audit(&request, &engagement, &program)?;
+    let output = match arguments.format {
+        ReportFormat::Json => format!("{}\n", serde_json::to_string_pretty(&dossier)?),
+        ReportFormat::Markdown => render_dossier_markdown(&dossier)?,
+    };
+    write_output(&arguments.output, &output)?;
+
+    let threshold = parse_threshold(&arguments.fail_on)?;
+    let crossed = threshold.is_some_and(|minimum| {
+        dossier.control_results.iter().any(|control| {
+            control.audit_status == ControlTestStatus::Exception && control.severity >= minimum
+        })
+    });
+    Ok(if crossed {
+        Exit::FindingThreshold
+    } else {
+        Exit::Success
+    })
+}
+
+fn package(arguments: &PackageArgs) -> Result<Exit, AuditError> {
+    let dossier = read_json::<AuditDossier>(&arguments.dossier)?;
+    let package = build_audit_package(&dossier)?;
+    let manifest = format!("{}\n", serde_json::to_string_pretty(&package.manifest)?);
+    create_dir(&arguments.output_dir)?;
+    for document in &package.documents {
+        write_new_file(
+            &arguments.output_dir.join(&document.file_name),
+            document.content.as_bytes(),
+        )?;
+    }
+    write_new_file(
+        &arguments.output_dir.join("package-manifest.json"),
+        manifest.as_bytes(),
+    )?;
+    Ok(Exit::Success)
+}
+
 fn prompt(arguments: &PromptArgs) -> Result<Exit, AuditError> {
     let report: AuditReport = read_json(&arguments.report)?;
     verify_report(&report)?;
@@ -174,6 +221,15 @@ fn write_output(path: &str, contents: &str) -> Result<(), AuditError> {
     let file = OpenOptions::new().create_new(true).write(true).open(path)?;
     let mut writer = BufWriter::new(file);
     writer.write_all(contents.as_bytes())?;
+    writer.flush()?;
+    writer.get_ref().sync_all()?;
+    Ok(())
+}
+
+fn write_new_file(path: &Path, contents: &[u8]) -> Result<(), AuditError> {
+    let file = OpenOptions::new().create_new(true).write(true).open(path)?;
+    let mut writer = BufWriter::new(file);
+    writer.write_all(contents)?;
     writer.flush()?;
     writer.get_ref().sync_all()?;
     Ok(())

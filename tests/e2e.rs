@@ -30,9 +30,9 @@ fn example_assessment_is_deterministic_and_complete() -> Result<(), Box<dyn Erro
     assert_eq!(first, second);
     assert_eq!(first.summary.passed, 9);
     assert_eq!(first.summary.failed, 9);
-    assert_eq!(first.summary.unknown, 2);
+    assert_eq!(first.summary.unknown, 17);
     assert_eq!(first.summary.high_or_critical, 9);
-    assert_eq!(first.findings.len(), 20);
+    assert_eq!(first.findings.len(), 35);
     verify_report(&first)?;
     Ok(())
 }

@@ -430,6 +430,270 @@
         { "frameworkId": "gdpr-2016-679", "reference": "Articles 25 and 35" }
       ],
       "remediation": "Define risk-based evaluations, acceptance thresholds, human review, monitoring, incident handling, and evidence for every material AI system."
+    },
+    {
+      "id": "governance.internal-audit",
+      "title": "The internal audit program covers the declared management-system scope",
+      "category": "governance",
+      "severity": "high",
+      "evidenceType": "governance.internal-audit",
+      "condition": { "fact": "in_scope_control_coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "frameworkMappings": [
+        { "frameworkId": "iso-iec-27001-2022", "reference": "Clause 9.2" },
+        { "frameworkId": "nist-csf-2.0", "reference": "GV.OV-01" },
+        { "frameworkId": "nist-800-53-r5", "reference": "CA-2" },
+        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC4.1" },
+        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(8)" },
+        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 12.4.2" }
+      ],
+      "remediation": "Establish a risk-based internal audit schedule, preserve scope and procedure records, separate preparation from review, and track corrective actions."
+    },
+    {
+      "id": "governance.management-review",
+      "title": "Executive management reviews the security and privacy program on schedule",
+      "category": "governance",
+      "severity": "high",
+      "evidenceType": "governance.management-review",
+      "condition": { "fact": "review_overdue_days", "operator": "number_at_most", "expected": 0 },
+      "frameworkMappings": [
+        { "frameworkId": "iso-iec-27001-2022", "reference": "Clause 9.3" },
+        { "frameworkId": "nist-csf-2.0", "reference": "GV.OV-02" },
+        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC1.2 and CC4.1" },
+        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(8)" }
+      ],
+      "remediation": "Schedule management reviews with required inputs, decisions, accountable owners, target dates, and retained minutes."
+    },
+    {
+      "id": "identity.lifecycle-coverage",
+      "title": "Joiner, mover, and leaver access workflows cover all in-scope identities",
+      "category": "identity",
+      "severity": "critical",
+      "evidenceType": "identity.lifecycle",
+      "condition": { "fact": "timely_lifecycle_coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "frameworkMappings": [
+        { "frameworkId": "nist-csf-2.0", "reference": "PR.AA-05" },
+        { "frameworkId": "nist-800-53-r5", "reference": "AC-2" },
+        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.16 and 5.18" },
+        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC6.2 and CC6.3" },
+        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(3)" },
+        { "frameworkId": "gdpr-2016-679", "reference": "Article 32" },
+        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirements 7.2 and 8.2" },
+        { "frameworkId": "cis-controls-8.1", "reference": "Safeguards 5.1 and 6.1" }
+      ],
+      "remediation": "Integrate authoritative workforce events with access provisioning, approval, role-change review, rapid termination, and reconciliation."
+    },
+    {
+      "id": "identity.privileged-access",
+      "title": "Privileged access is separately authorized, protected, and inventoried",
+      "category": "identity",
+      "severity": "critical",
+      "evidenceType": "identity.privileged-access",
+      "condition": { "fact": "unmanaged_privileged_identity_count", "operator": "number_at_most", "expected": 0 },
+      "frameworkMappings": [
+        { "frameworkId": "nist-csf-2.0", "reference": "PR.AA-05" },
+        { "frameworkId": "nist-800-53-r5", "reference": "AC-6" },
+        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.2" },
+        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC6.3" },
+        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.312(a)(1)" },
+        { "frameworkId": "gdpr-2016-679", "reference": "Article 32" },
+        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 7.2.1" },
+        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 5.4" }
+      ],
+      "remediation": "Inventory privileged identities, require separate named accounts and MFA, apply just-in-time authorization where possible, and review usage."
+    },
+    {
+      "id": "data.key-management",
+      "title": "Encryption keys have managed ownership, rotation, access, backup, and retirement",
+      "category": "data-protection",
+      "severity": "critical",
+      "evidenceType": "data.key-management",
+      "condition": { "fact": "unmanaged_material_key_count", "operator": "number_at_most", "expected": 0 },
+      "frameworkMappings": [
+        { "frameworkId": "nist-csf-2.0", "reference": "PR.DS-01 and PR.DS-02" },
+        { "frameworkId": "nist-800-53-r5", "reference": "SC-12" },
+        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.24" },
+        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC6.1" },
+        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.312(a)(2)(iv) and (e)(2)(ii)" },
+        { "frameworkId": "gdpr-2016-679", "reference": "Article 32" },
+        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 3.6" },
+        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 3.11" }
+      ],
+      "remediation": "Centralize material keys, separate key administration from data access, define cryptoperiods, rotate, revoke, recover, and log all key lifecycle activity."
+    },
+    {
+      "id": "privacy.processing-inventory",
+      "title": "Records of processing cover all material personal-data activities",
+      "category": "privacy",
+      "severity": "high",
+      "evidenceType": "privacy.processing-inventory",
+      "condition": { "fact": "material_processing_coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "frameworkMappings": [
+        { "frameworkId": "gdpr-2016-679", "reference": "Article 30" },
+        { "frameworkId": "nist-csf-2.0", "reference": "ID.AM-07" },
+        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.9 and 5.34" },
+        { "frameworkId": "soc2-tsc-2017-2022", "reference": "P3.1" },
+        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(1)" }
+      ],
+      "remediation": "Maintain owners, purposes, legal bases, categories, recipients, transfers, retention, systems, subprocessors, and security measures for every material processing activity."
+    },
+    {
+      "id": "privacy.impact-assessments",
+      "title": "High-risk processing receives a documented privacy impact assessment before use",
+      "category": "privacy",
+      "severity": "high",
+      "evidenceType": "privacy.impact-assessment",
+      "condition": { "fact": "overdue_high_risk_assessment_count", "operator": "number_at_most", "expected": 0 },
+      "frameworkMappings": [
+        { "frameworkId": "gdpr-2016-679", "reference": "Articles 25 and 35" },
+        { "frameworkId": "nist-ai-rmf-1.0", "reference": "MAP 1 and MAP 5" },
+        { "frameworkId": "nist-csf-2.0", "reference": "GV.RM-03" },
+        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.34" },
+        { "frameworkId": "soc2-tsc-2017-2022", "reference": "P4.1" }
+      ],
+      "remediation": "Add a risk trigger to product and vendor intake, document necessity and proportionality, consult required stakeholders, approve mitigations, and reassess changes."
+    },
+    {
+      "id": "privacy.breach-notification",
+      "title": "Privacy incidents can be assessed and notified within applicable deadlines",
+      "category": "privacy",
+      "severity": "critical",
+      "evidenceType": "privacy.breach-response",
+      "condition": { "fact": "deadline_aware_workflow_tested", "operator": "equals", "expected": true },
+      "frameworkMappings": [
+        { "frameworkId": "gdpr-2016-679", "reference": "Articles 33 and 34" },
+        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR Parts 164.400-414" },
+        { "frameworkId": "nist-csf-2.0", "reference": "RS.CO-02 and RS.CO-03" },
+        { "frameworkId": "nist-800-53-r5", "reference": "IR-6" },
+        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.24 through 5.28" },
+        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC7.4" }
+      ],
+      "remediation": "Maintain jurisdiction-aware decision trees, clocks, escalation paths, regulator and individual notification templates, legal review, and exercise evidence."
+    },
+    {
+      "id": "privacy.processor-contracts",
+      "title": "Material processors and regulated partners have required contractual terms",
+      "category": "privacy",
+      "severity": "high",
+      "evidenceType": "privacy.processor-contracts",
+      "condition": { "fact": "required_contract_coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "frameworkMappings": [
+        { "frameworkId": "gdpr-2016-679", "reference": "Articles 28 and 46" },
+        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(b) and 164.502(e)" },
+        { "frameworkId": "nist-csf-2.0", "reference": "GV.SC-05" },
+        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.20 and 5.21" },
+        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC9.2" }
+      ],
+      "remediation": "Inventory processors and business associates, execute required terms before access, control transfers and subprocessors, and monitor renewal and termination obligations."
+    },
+    {
+      "id": "vendors.continuous-monitoring",
+      "title": "Material vendors receive recurring risk and assurance monitoring",
+      "category": "third-party-risk",
+      "severity": "high",
+      "evidenceType": "vendors.monitoring",
+      "condition": { "fact": "overdue_material_vendor_review_count", "operator": "number_at_most", "expected": 0 },
+      "frameworkMappings": [
+        { "frameworkId": "nist-csf-2.0", "reference": "GV.SC-06 through GV.SC-10" },
+        { "frameworkId": "nist-800-53-r5", "reference": "SR-6" },
+        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.19 through 5.22" },
+        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC9.2" },
+        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(b)" },
+        { "frameworkId": "gdpr-2016-679", "reference": "Article 28" },
+        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 12.8" },
+        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 15.4" }
+      ],
+      "remediation": "Tier vendors by inherent risk, monitor material changes and assurance, review on schedule, track exceptions, and execute secure offboarding."
+    },
+    {
+      "id": "vulnerability.patch-sla",
+      "title": "Security patches meet risk-based deployment service levels",
+      "category": "vulnerability-management",
+      "severity": "critical",
+      "evidenceType": "vulnerability.patch-management",
+      "condition": { "fact": "critical_patch_sla_breach_count", "operator": "number_at_most", "expected": 0 },
+      "frameworkMappings": [
+        { "frameworkId": "nist-csf-2.0", "reference": "ID.RA-01 and PR.PS-02" },
+        { "frameworkId": "nist-800-53-r5", "reference": "SI-2" },
+        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.8" },
+        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC7.1" },
+        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(5)(ii)(B)" },
+        { "frameworkId": "gdpr-2016-679", "reference": "Article 32" },
+        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 6.3.3" },
+        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 7.4" }
+      ],
+      "remediation": "Define severity- and exposure-aware patch deadlines, test and deploy fixes, document exceptions and compensating controls, and verify closure."
+    },
+    {
+      "id": "application.secure-development",
+      "title": "Material software follows reviewed secure development and release gates",
+      "category": "application-security",
+      "severity": "high",
+      "evidenceType": "application.secure-development",
+      "condition": { "fact": "protected_release_coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "frameworkMappings": [
+        { "frameworkId": "nist-csf-2.0", "reference": "PR.PS-06" },
+        { "frameworkId": "nist-800-53-r5", "reference": "SA-11" },
+        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.25 through 8.31" },
+        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC8.1" },
+        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(1)(ii)(B)" },
+        { "frameworkId": "gdpr-2016-679", "reference": "Article 25" },
+        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 6.2" },
+        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 16.1" }
+      ],
+      "remediation": "Apply threat modeling, peer review, automated security tests, dependency and secret checks, approval, traceability, and rollback controls to every material release."
+    },
+    {
+      "id": "incident.response-plan",
+      "title": "Incident response roles, playbooks, communications, and evidence handling are current",
+      "category": "incident-response",
+      "severity": "critical",
+      "evidenceType": "incident.response-plan",
+      "condition": { "fact": "approved_and_current", "operator": "equals", "expected": true },
+      "frameworkMappings": [
+        { "frameworkId": "nist-csf-2.0", "reference": "RS.MA-01 and RS.MA-02" },
+        { "frameworkId": "nist-800-53-r5", "reference": "IR-8" },
+        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.24 through 5.28" },
+        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC7.4" },
+        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(6)" },
+        { "frameworkId": "gdpr-2016-679", "reference": "Articles 33 and 34" },
+        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 12.10" },
+        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 17.4" }
+      ],
+      "remediation": "Approve severity definitions, roles, contact paths, playbooks, evidence preservation, legal and privacy escalation, communications, recovery, and lessons-learned workflow."
+    },
+    {
+      "id": "resilience.business-continuity",
+      "title": "Business continuity analysis and plans cover material services and dependencies",
+      "category": "resilience",
+      "severity": "high",
+      "evidenceType": "resilience.business-continuity",
+      "condition": { "fact": "material_service_coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "frameworkMappings": [
+        { "frameworkId": "nist-csf-2.0", "reference": "RC.RP-01 through RC.RP-06" },
+        { "frameworkId": "nist-800-53-r5", "reference": "CP-2" },
+        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.29 and 5.30" },
+        { "frameworkId": "soc2-tsc-2017-2022", "reference": "A1.2 and A1.3" },
+        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(7)" },
+        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 12.10.1" }
+      ],
+      "remediation": "Perform business impact analysis, set approved recovery objectives, map people and third-party dependencies, document continuity strategies, and exercise them."
+    },
+    {
+      "id": "ai.incident-monitoring",
+      "title": "Material AI systems have production monitoring, human escalation, and incident handling",
+      "category": "ai-governance",
+      "severity": "high",
+      "evidenceType": "ai.monitoring",
+      "condition": { "fact": "material_system_monitoring_coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "frameworkMappings": [
+        { "frameworkId": "nist-ai-rmf-1.0", "reference": "MEASURE 2 and MANAGE 4" },
+        { "frameworkId": "nist-csf-2.0", "reference": "DE.CM-09 and RS.MA-02" },
+        { "frameworkId": "nist-800-53-r5", "reference": "SI-4" },
+        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.16" },
+        { "frameworkId": "gdpr-2016-679", "reference": "Articles 22, 25 and 35" },
+        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC7.2 and CC7.4" }
+      ],
+      "remediation": "Monitor quality, safety, privacy, security, drift, abuse, and human-override signals; define thresholds, escalation, rollback, notification, and learning loops."
     }
   ]
 }

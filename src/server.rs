@@ -16,8 +16,10 @@ use serde_json::json;
 use sha2::Sha256;
 
 use crate::AuditError;
+use crate::audit::{AuditDossier, AuditRequest, run_audit};
 use crate::engine::assess;
 use crate::model::AssessmentRequest;
+use crate::package::build_audit_package;
 use crate::program::{AssessmentProgram, built_in_program};
 use crate::report::PromptKind;
 
@@ -89,6 +91,8 @@ fn router(state: AppState, max_body_bytes: usize) -> Router {
         .route("/v1/catalog", get(catalog))
         .route("/v1/prompts/{name}", get(prompt_template))
         .route("/v1/assessments", post(assessment))
+        .route("/v1/audits", post(audit_engagement))
+        .route("/v1/audit-packages", post(audit_package))
         .route("/v1/webhooks/evidence", post(assessment))
         .layer(DefaultBodyLimit::max(max_body_bytes))
         .with_state(state)
@@ -138,6 +142,52 @@ async fn assessment(State(state): State<AppState>, headers: HeaderMap, body: Byt
         Err(error) => error_response(
             StatusCode::UNPROCESSABLE_ENTITY,
             "assessment_rejected",
+            &error.to_string(),
+        ),
+    }
+}
+
+async fn audit_engagement(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    body: Bytes,
+) -> Response {
+    if let Err((code, message)) = authenticate(&state, &headers, &body) {
+        return error_response(StatusCode::UNAUTHORIZED, code, message);
+    }
+    let Ok(request) = serde_json::from_slice::<AuditRequest>(&body) else {
+        return error_response(
+            StatusCode::BAD_REQUEST,
+            "invalid_request",
+            "body must contain assessment inputs and canonical.audit-engagement/v1",
+        );
+    };
+    match run_audit(&request.assessment, &request.engagement, &state.program) {
+        Ok(dossier) => JsonResponse::ok(dossier).into_response(),
+        Err(error) => error_response(
+            StatusCode::UNPROCESSABLE_ENTITY,
+            "audit_rejected",
+            &error.to_string(),
+        ),
+    }
+}
+
+async fn audit_package(State(state): State<AppState>, headers: HeaderMap, body: Bytes) -> Response {
+    if let Err((code, message)) = authenticate(&state, &headers, &body) {
+        return error_response(StatusCode::UNAUTHORIZED, code, message);
+    }
+    let Ok(dossier) = serde_json::from_slice::<AuditDossier>(&body) else {
+        return error_response(
+            StatusCode::BAD_REQUEST,
+            "invalid_request",
+            "body must match canonical.audit-dossier/v1",
+        );
+    };
+    match build_audit_package(&dossier) {
+        Ok(package) => JsonResponse::ok(package).into_response(),
+        Err(error) => error_response(
+            StatusCode::UNPROCESSABLE_ENTITY,
+            "package_rejected",
             &error.to_string(),
         ),
     }

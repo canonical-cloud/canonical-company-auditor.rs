@@ -4,11 +4,14 @@
 //! AI-assisted narrative generation outside the evidence and decision boundary.
 
 pub mod app;
+pub mod audit;
 pub mod cli;
+pub mod engagement;
 pub mod engine;
 pub mod evidence;
 pub mod flags;
 pub mod model;
+pub mod package;
 pub mod program;
 pub mod report;
 pub mod server;

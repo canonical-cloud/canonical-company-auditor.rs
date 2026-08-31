@@ -21,6 +21,15 @@ EvidenceBundle -> validate -> seal +--> AssessmentProgram -> evaluate -> AuditRe
                                    |                          |              +-> AI prompt
                                    |                          |
                                    +-> tenant/scope/freshness +-> reference mappings
+
+AuditEngagement -> validate references -> requests + samples + workpapers + review
+        |                                      |                         |
+        +-> lifecycle + actors + milestones    +-> exceptions/responses  |
+                                                                          v
+AuditReport + sealed evidence index + AuditEngagement ----------------> AuditDossier
+                                                                          |
+                                                                          +-> full report package
+                                                                          +-> integrity manifest
 ```
 
 `seal_evidence` computes canonical hashes and observation identities from tenant, external ID,
@@ -36,9 +45,10 @@ condition returns `true`, `false`, or type-incompatible:
 - otherwise, any current `false` observation makes the test fail; and
 - no current compatible observation makes the test unknown.
 
-This aggregation is appropriate for the initial organization-level baseline. Later programs that
-need universal quantification, sampling, populations, exceptions, or per-system coverage must add
-new explicit operators and conformance fixtures rather than silently reinterpret these rules.
+This aggregation is appropriate for organization-level readiness. Population and sample selection,
+auditor exceptions, and reviewer conclusions are separate engagement records rather than hidden
+changes to readiness semantics. Programs that need universal quantification or per-system coverage
+must add explicit operators and conformance fixtures rather than silently reinterpret a rule.
 
 ## Identity model
 
@@ -50,6 +60,11 @@ manifestSha256    = SHA-256(company manifest)
 evidenceSha256    = SHA-256(evidence bundle)
 programSha256     = SHA-256(assessment program)
 reportId          = SHA-256(all report fields except reportId)
+engagementSha256  = SHA-256(audit engagement)
+trailEntrySha256  = SHA-256(previous trail digest + event)
+dossierId         = SHA-256(engagement + report + control results + indexes + trail)
+documentSha256    = SHA-256(exact generated UTF-8 document bytes)
+packageId         = SHA-256(dossierId + ordered document metadata)
 ```
 
 Hashes prove content identity, not authorship. Source signatures and service signing are future
@@ -59,9 +74,13 @@ signature in this release.
 ## HTTP boundary
 
 The Axum server loads one reviewed built-in program at startup. Request bodies are byte-bounded
-before JSON extraction. When `CANONICAL_WEBHOOK_SECRET` is set, both POST routes require
+before JSON extraction. When `CANONICAL_WEBHOOK_SECRET` is set, every POST route requires
 `X-Canonical-Signature: sha256=<hex>` over the exact body. HMAC verification uses the library's
 constant-time comparison.
+
+`/v1/assessments` and `/v1/webhooks/evidence` evaluate readiness. `/v1/audits` validates a
+dress-rehearsal or full-audit engagement and emits a dossier. `/v1/audit-packages` verifies a
+dossier and returns the complete in-memory report package. The server remains stateless.
 
 Development loopback may run unsigned. Non-loopback binding requires a signing secret, but that
 alone is not production authorization. A production adapter must bind shared-auth service identity
@@ -69,6 +88,25 @@ to a tenant and scope, reject replay, enforce quotas, and persist immutable pack
 
 No HTTP route imports code, runs a command, fetches a URL, calls a model, sends a callback, changes
 a customer system, or writes a report to disk.
+
+## Audit engagement boundary
+
+The engagement layer is deliberately separate from observed facts and deterministic rules. It
+records objective, criteria, observation period, mode, lifecycle phase, authorized actors,
+milestones, evidence requests, sampling, workpapers, exceptions, management responses, recipients,
+and ordered events. This permits the same readiness evidence to support an internal rehearsal and
+an authorized external audit without confusing tool evidence with auditor judgment.
+
+A finalized full audit fails closed unless every program rule has a completed workpaper, another
+actor approved every workpaper, all evidence requests are accepted or closed, every exception has
+a management response, milestones are complete, recipients are identified, and an independent
+lead or reviewer is recorded. The engine still labels its result a tool conclusion rather than an
+attestation.
+
+The CLI package exporter renders ten documents in memory, computes their exact byte counts and
+digests, creates a new directory, and uses create-only file writes. The manifest binds ordered
+document metadata to the dossier. It is therefore possible to detect a changed report document
+without placing raw normalized evidence values in the package.
 
 ## AI boundary
 

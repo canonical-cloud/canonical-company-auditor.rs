@@ -1,11 +1,14 @@
 # canonical-company-auditor.rs
 
-Rust-first whole-company readiness assessment for governance, people, process,
-technology, vendors, privacy, data, resilience, and AI risk. The repository provides:
+Rust-first whole-company readiness, dress-rehearsal, and full-audit support for governance,
+people, process, technology, vendors, privacy, data, resilience, and AI risk. The repository
+provides:
 
 - a deterministic CLI and assessment library;
 - a bounded HTTP service with HMAC-signed inbound webhooks;
-- Markdown and JSON reports with evidence and program digests;
+- audit engagements with requests, population sampling, workpapers, independent review,
+  exceptions, management responses, milestones, and a hash-chained audit trail;
+- Markdown and JSON readiness reports plus integrity-manifested full audit packages;
 - reviewed AI prompt packs for summaries, evidence review, gap analysis, and remediation;
 - opt-in Python and TypeScript runtime probes that fingerprint possible secret exposure
   without emitting inspected values;
@@ -14,9 +17,10 @@ technology, vendors, privacy, data, resilience, and AI risk. The repository prov
   SOC 2 Trust Services Criteria, HIPAA Security Rule, GDPR, PCI DSS 4.0.1,
   CIS Controls 8.1, and NIST AI RMF 1.0.
 
-This is a readiness and evidence tool. It does **not** issue certifications, legal
-opinions, regulatory determinations, a SOC report, a PCI validation, or an independent
-auditor attestation.
+This is a readiness, evidence, and auditor-workflow tool. It supports a qualified auditor's
+work but does **not** itself issue certifications, legal opinions, regulatory determinations,
+a SOC report, a PCI validation, or an independent auditor attestation. See the
+[external-tool parity matrix](docs/parity-matrix.md) for the exact capability boundary.
 
 ## Quick start
 
@@ -60,6 +64,27 @@ The prompt command verifies the report ID, manifest digest, summary, findings, a
 limitations before rendering. Every serialized report line is prefixed as untrusted
 data. Model output is prose only: it cannot become evidence or alter a finding.
 
+To run the included audit dress rehearsal and export its complete report package:
+
+```sh
+cargo run -- audit \
+  --manifest examples/company.json \
+  --evidence examples/evidence.json \
+  --engagement examples/dress-rehearsal-engagement.json \
+  --format json \
+  --fail-on never \
+  --output rehearsal-dossier.json
+
+cargo run -- package \
+  --dossier rehearsal-dossier.json \
+  --output-dir rehearsal-report-package
+```
+
+The example is intentionally incomplete: it shows exactly where fieldwork would stop before
+an external audit. `package` verifies the dossier, creates a new directory, writes ten
+human- and machine-readable documents, and adds `package-manifest.json` with exact byte
+counts and SHA-256 digests. It refuses to reuse an existing output path.
+
 ## What the engine decides
 
 The built-in program contains Canonical-authored tests. Each test consumes a named,
@@ -81,17 +106,18 @@ explicit `assessmentPeriod.endsAt` is the freshness boundary.
 
 ## Whole-company baseline
 
-The 20 initial tests cover:
+The 35 built-in tests cover:
 
-- policy inventory, enterprise risk register, and applicability analysis;
-- asset inventory, MFA, and periodic access review;
-- data classification, encryption, retention/deletion, and privacy-rights workflows;
-- vendor due diligence and contractual safeguards;
-- protected change paths and vulnerability remediation;
-- logging/detection coverage and incident exercises;
-- backup restoration and workforce training;
-- runtime secret exposure; and
-- AI system inventory and evaluation governance.
+- policy inventory, enterprise risk, applicability, internal audit, and management review;
+- asset inventory, MFA, identity lifecycle, privileged access, and periodic access review;
+- data classification, encryption, key management, retention, and deletion;
+- privacy rights, processing records, impact assessments, breach notification, processor
+  contracts, and regulated transfers;
+- vendor due diligence, contractual safeguards, and continuing monitoring;
+- protected change paths, secure development, vulnerability remediation, and patch SLAs;
+- logging/detection, incident plans and exercises, business continuity, and backup restore;
+- workforce training and runtime secret exposure; and
+- AI system inventory, evaluation governance, and production incident monitoring.
 
 The profile is intentionally a strong starting point, not a universal checklist. A real
 engagement must tailor scope, materiality, evidence freshness, sampling, regulatory
@@ -135,6 +161,8 @@ Routes:
 | `GET` | `/v1/catalog` | Reviewed built-in program metadata. |
 | `GET` | `/v1/prompts/{name}` | Reviewed prompt template without assessment data. |
 | `POST` | `/v1/assessments` | Synchronous deterministic assessment. |
+| `POST` | `/v1/audits` | Dress-rehearsal or full-audit dossier from assessment and engagement inputs. |
+| `POST` | `/v1/audit-packages` | Complete report package from a verified dossier. |
 | `POST` | `/v1/webhooks/evidence` | Alias for signed inbound assessment/evidence events. |
 
 POST bodies use this envelope:
@@ -145,6 +173,11 @@ POST bodies use this envelope:
   "evidence": { "...": "evidence-bundle-v1" }
 }
 ```
+
+`POST /v1/audits` adds an `engagement` property matching
+`canonical.audit-engagement/v1`. `POST /v1/audit-packages` accepts a complete
+`canonical.audit-dossier/v1` document. All POST routes use the same exact-body signature
+policy.
 
 Set `CANONICAL_WEBHOOK_SECRET` to at least 32 bytes to require signatures. The signature is
 lowercase hex HMAC-SHA-256 of the exact request body:
@@ -222,15 +255,15 @@ No collector or report endpoint performs remediation mutations.
 ## Schemas and layout
 
 ```text
-src/                 Rust domain, evaluator, CLI, report, flags, and server
+src/                 Rust readiness, engagement, audit, package, CLI, flags, and server
 programs/            Reviewed versioned assessment overlays
 prompts/             Reviewed AI narrative templates
 schemas/             JSON Schema 2020-12 boundaries
 probes/python/       Opt-in Python module inspection
 probes/typescript/   Opt-in JS/TypeScript module inspection
 examples/            Non-sensitive runnable fixtures
-tests/               E2E and property conformance
-docs/                Architecture and threat-model detail
+tests/               E2E, audit-workflow, integrity, and property conformance
+docs/                Architecture, threat-model, and parity detail
 ```
 
 ## Validation

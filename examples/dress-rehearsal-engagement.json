@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "canonical.audit-engagement/v1",
+  "engagementId": "engagement-example-rehearsal",
+  "tenantId": "tenant-example",
+  "scopeId": "organization/example",
+  "title": "Example Company multi-framework dress rehearsal",
+  "mode": "dress_rehearsal",
+  "phase": "fieldwork",
+  "period": {
+    "startsAt": 1756684800,
+    "endsAt": 1788134400
+  },
+  "frameworkIds": [
+    "cis-controls-8.1",
+    "gdpr-2016-679",
+    "hipaa-security-rule",
+    "iso-iec-27001-2022",
+    "nist-800-53-r5",
+    "nist-ai-rmf-1.0",
+    "nist-csf-2.0",
+    "pci-dss-4.0.1",
+    "soc2-tsc-2017-2022"
+  ],
+  "objective": "Rehearse the evidence request, testing, review, exception, and reporting workflow before an external audit.",
+  "criteria": "Canonical-authored whole-company tests mapped to the selected public framework references.",
+  "actors": [
+    {
+      "actorId": "internal-audit-lead",
+      "role": "audit_lead",
+      "organization": "Example Company",
+      "displayName": "Internal Audit Lead",
+      "independent": false
+    },
+    {
+      "actorId": "internal-auditor",
+      "role": "auditor",
+      "organization": "Example Company",
+      "displayName": "Internal Auditor",
+      "independent": false
+    },
+    {
+      "actorId": "internal-reviewer",
+      "role": "reviewer",
+      "organization": "Example Company",
+      "displayName": "Internal Reviewer",
+      "independent": false
+    },
+    {
+      "actorId": "security-owner",
+      "role": "evidence_owner",
+      "organization": "Example Company",
+      "displayName": "Security Evidence Owner",
+      "independent": false
+    }
+  ],
+  "milestones": [
+    {
+      "milestoneId": "rehearsal-fieldwork",
+      "title": "Dress-rehearsal fieldwork complete",
+      "dueAt": 1788134400
+    }
+  ],
+  "evidenceRequests": [
+    {
+      "requestId": "request-policy-inventory",
+      "title": "Provide the current policy inventory and approval record",
+      "ruleIds": ["governance.policy-inventory"],
+      "ownerId": "security-owner",
+      "dueAt": 1788134400,
+      "status": "accepted",
+      "evidenceExternalIds": ["policy-2026-q3"],
+      "auditorNote": "Accepted for rehearsal testing."
+    },
+    {
+      "requestId": "request-access-review",
+      "title": "Provide the quarterly privileged-access review population",
+      "ruleIds": ["identity.access-review-age"],
+      "ownerId": "security-owner",
+      "dueAt": 1788134400,
+      "status": "submitted",
+      "evidenceExternalIds": ["access-review-2026-q3"],
+      "auditorNote": "Population completeness remains under review."
+    }
+  ],
+  "samplePlans": [
+    {
+      "samplePlanId": "sample-access-review",
+      "ruleId": "identity.access-review-age",
+      "populationId": "privileged-access-review-population-q3",
+      "populationSize": 1,
+      "method": "full_population",
+      "sampleSize": 1,
+      "selectedItemFingerprints": [
+        "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "rationale": "The complete illustrative population contains one quarterly review record."
+    }
+  ],
+  "workpapers": [
+    {
+      "workpaperId": "workpaper-policy-inventory",
+      "ruleId": "governance.policy-inventory",
+      "preparerId": "internal-auditor",
+      "preparedAt": 1788134400,
+      "procedurePerformed": "Inspected the policy inventory evidence, approval state, ownership, and review currency.",
+      "designConclusion": "effective",
+      "operatingConclusion": "effective",
+      "evidenceExternalIds": ["policy-2026-q3"],
+      "exceptions": [],
+      "reviewerSignoff": {
+        "reviewerId": "internal-reviewer",
+        "reviewedAt": 1788134401,
+        "conclusion": "approved",
+        "note": "The procedure and evidence citation support the rehearsal conclusion."
+      }
+    },
+    {
+      "workpaperId": "workpaper-access-review",
+      "ruleId": "identity.access-review-age",
+      "preparerId": "internal-auditor",
+      "preparedAt": 1788134400,
+      "procedurePerformed": "Inspected the quarterly review population and tested the complete illustrative population.",
+      "designConclusion": "effective",
+      "operatingConclusion": "not_tested",
+      "evidenceExternalIds": ["access-review-2026-q3"],
+      "samplePlanId": "sample-access-review",
+      "exceptions": []
+    }
+  ],
+  "managementResponses": [],
+  "events": [
+    {
+      "sequence": 0,
+      "eventType": "engagement.created",
+      "actorId": "internal-audit-lead",
+      "occurredAt": 1788134300,
+      "subjectId": "engagement-example-rehearsal",
+      "payloadSha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "sequence": 1,
+      "eventType": "evidence.accepted",
+      "actorId": "internal-auditor",
+      "occurredAt": 1788134400,
+      "subjectId": "request-policy-inventory",
+      "payloadSha256": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  ],
+  "reportRecipients": ["Security Steering Committee"]
+}

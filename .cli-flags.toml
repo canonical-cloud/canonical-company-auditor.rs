@@ -98,6 +98,70 @@ type = "string"
 default = "high"
 help = "Exit threshold: never, info, low, medium, high, or critical."
 
+[commands.audit]
+help = "Run a dress-rehearsal or full-audit engagement."
+
+[commands.audit.flags.manifest]
+env = "CANONICAL_AUDITOR_AUDIT_MANIFEST"
+aliases = ["manifest"]
+type = "string"
+help = "Company manifest JSON path."
+
+[commands.audit.flags.evidence]
+env = "CANONICAL_AUDITOR_AUDIT_EVIDENCE"
+aliases = ["evidence"]
+type = "string"
+help = "Evidence bundle JSON path."
+
+[commands.audit.flags.engagement]
+env = "CANONICAL_AUDITOR_AUDIT_ENGAGEMENT"
+aliases = ["engagement"]
+type = "string"
+help = "Audit engagement JSON path."
+
+[commands.audit.flags.program]
+env = "CANONICAL_AUDITOR_AUDIT_PROGRAM"
+aliases = ["program"]
+type = "string"
+help = "Optional assessment program JSON path."
+
+[commands.audit.flags.output]
+env = "CANONICAL_AUDITOR_AUDIT_OUTPUT"
+aliases = ["output"]
+short = "o"
+type = "string"
+default = "-"
+help = "Dossier path, or '-' for stdout."
+
+[commands.audit.flags.format]
+env = "CANONICAL_AUDITOR_AUDIT_FORMAT"
+aliases = ["format"]
+type = "string"
+default = "markdown"
+help = "Dossier format: markdown or json."
+
+[commands.audit.flags.fail-on]
+env = "CANONICAL_AUDITOR_AUDIT_FAIL_ON"
+aliases = ["fail-on"]
+type = "string"
+default = "high"
+help = "Exit threshold for exception controls: never, info, low, medium, high, or critical."
+
+[commands.package]
+help = "Export a verified audit dossier as a complete report package."
+
+[commands.package.flags.dossier]
+env = "CANONICAL_AUDITOR_PACKAGE_DOSSIER"
+aliases = ["dossier"]
+type = "string"
+help = "Existing audit dossier JSON path."
+
+[commands.package.flags.output-dir]
+env = "CANONICAL_AUDITOR_PACKAGE_OUTPUT_DIR"
+aliases = ["output-dir"]
+type = "string"
+help = "New report package directory; existing paths are refused."
+
 [commands.prompt]
 help = "Render a constrained AI narrative prompt from a report."
 

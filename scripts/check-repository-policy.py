@@ -105,7 +105,7 @@ def check_program() -> None:
         fail("built-in program has the wrong schema version")
     frameworks = program.get("frameworks", [])
     rules = program.get("rules", [])
-    if len(frameworks) < 8 or len(rules) < 15:
+    if len(frameworks) < 9 or len(rules) < 35:
         fail("built-in program does not provide broad framework and whole-company coverage")
     identifiers = {item.get("id") for item in frameworks}
     if len(identifiers) != len(frameworks):
@@ -137,10 +137,57 @@ def check_json_assets() -> None:
         *sorted((ROOT / "schemas").glob("*.json")),
         *sorted((ROOT / "examples").glob("*.json")),
     ]
-    if len(paths) < 5:
+    if len(paths) < 8:
         fail("schemas or example fixtures are incomplete")
     for path in paths:
         load_json(path)
+
+
+def check_audit_parity() -> None:
+    required = (
+        "src/audit.rs",
+        "src/engagement.rs",
+        "src/package.rs",
+        "schemas/audit-engagement-v1.schema.json",
+        "schemas/audit-dossier-v1.schema.json",
+        "schemas/audit-package-v1.schema.json",
+        "examples/dress-rehearsal-engagement.json",
+        "docs/parity-matrix.md",
+        "tests/audit_workflow.rs",
+    )
+    for relative in required:
+        if not (ROOT / relative).is_file():
+            fail(f"audit parity asset is missing: {relative}")
+
+    engagement = load_json(ROOT / "examples" / "dress-rehearsal-engagement.json")
+    if engagement.get("schemaVersion") != "canonical.audit-engagement/v1":
+        fail("dress rehearsal uses the wrong engagement schema")
+    if engagement.get("mode") != "dress_rehearsal":
+        fail("the runnable example must exercise dress-rehearsal mode")
+
+    cli = load_text(ROOT / "src" / "cli.rs")
+    server = load_text(ROOT / "src" / "server.rs")
+    package = load_text(ROOT / "src" / "package.rs")
+    for command in ("Audit(AuditArgs)", "Package(PackageArgs)"):
+        if command not in cli:
+            fail(f"typed CLI is missing {command}")
+    for route in ('"/v1/audits"', '"/v1/audit-packages"'):
+        if route not in server:
+            fail(f"HTTP service is missing {route}")
+    for document in (
+        "00-audit-report.md",
+        "01-control-testing.md",
+        "02-evidence-manifest.md",
+        "03-evidence-requests.md",
+        "04-sampling.md",
+        "05-workpaper-index.md",
+        "06-findings-and-actions.md",
+        "07-audit-trail.md",
+        "08-framework-crosswalk.md",
+        "audit-dossier.json",
+    ):
+        if document not in package:
+            fail(f"complete audit package is missing {document}")
 
 
 def check_workflows() -> None:
@@ -202,6 +249,7 @@ def main() -> None:
     check_program()
     check_prompts()
     check_json_assets()
+    check_audit_parity()
     check_workflows()
     check_probe_boundaries()
     check_no_credentials()
