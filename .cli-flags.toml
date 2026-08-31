@@ -1,0 +1,139 @@
+# Portable argv contract. The binary embeds, audits, and applies this contract before Clap.
+# Credentials are environment/secret-store only and are intentionally absent from this file.
+
+[help]
+url = "https://github.com/canonical-cloud/canonical-company-auditor.rs"
+columns = ["options", "env", "type", "default", "description"]
+
+[parse]
+allow_unknown = false
+stop_at_first_positional = false
+command_env = "CANONICAL_AUDITOR_COMMAND_PATH"
+
+[flags.help]
+env = "CANONICAL_AUDITOR_HELP_REQUESTED"
+aliases = ["help"]
+short = "h"
+type = "bool"
+help = "Print command-aware help."
+
+[flags.version]
+env = "CANONICAL_AUDITOR_VERSION_REQUESTED"
+aliases = ["version"]
+short = "V"
+type = "bool"
+help = "Print the canonical-auditor version."
+
+[commands.catalog]
+help = "Inspect reviewed framework metadata and rule coverage."
+
+[commands.catalog.flags.format]
+env = "CANONICAL_AUDITOR_CATALOG_FORMAT"
+aliases = ["format"]
+type = "string"
+default = "table"
+help = "Catalog format: table or json."
+
+[commands.validate]
+help = "Validate an assessment input without producing a report."
+
+[commands.validate.flags.manifest]
+env = "CANONICAL_AUDITOR_VALIDATE_MANIFEST"
+aliases = ["manifest"]
+type = "string"
+help = "Company manifest JSON path."
+
+[commands.validate.flags.evidence]
+env = "CANONICAL_AUDITOR_VALIDATE_EVIDENCE"
+aliases = ["evidence"]
+type = "string"
+help = "Evidence bundle JSON path."
+
+[commands.validate.flags.program]
+env = "CANONICAL_AUDITOR_VALIDATE_PROGRAM"
+aliases = ["program"]
+type = "string"
+help = "Optional assessment program JSON path."
+
+[commands.assess]
+help = "Run a deterministic whole-company assessment."
+
+[commands.assess.flags.manifest]
+env = "CANONICAL_AUDITOR_ASSESS_MANIFEST"
+aliases = ["manifest"]
+type = "string"
+help = "Company manifest JSON path."
+
+[commands.assess.flags.evidence]
+env = "CANONICAL_AUDITOR_ASSESS_EVIDENCE"
+aliases = ["evidence"]
+type = "string"
+help = "Evidence bundle JSON path."
+
+[commands.assess.flags.program]
+env = "CANONICAL_AUDITOR_ASSESS_PROGRAM"
+aliases = ["program"]
+type = "string"
+help = "Optional assessment program JSON path."
+
+[commands.assess.flags.output]
+env = "CANONICAL_AUDITOR_ASSESS_OUTPUT"
+aliases = ["output"]
+short = "o"
+type = "string"
+default = "-"
+help = "Report path, or '-' for stdout."
+
+[commands.assess.flags.format]
+env = "CANONICAL_AUDITOR_ASSESS_FORMAT"
+aliases = ["format"]
+type = "string"
+default = "markdown"
+help = "Report format: markdown or json."
+
+[commands.assess.flags.fail-on]
+env = "CANONICAL_AUDITOR_ASSESS_FAIL_ON"
+aliases = ["fail-on"]
+type = "string"
+default = "high"
+help = "Exit threshold: never, info, low, medium, high, or critical."
+
+[commands.prompt]
+help = "Render a constrained AI narrative prompt from a report."
+
+[commands.prompt.flags.name]
+env = "CANONICAL_AUDITOR_PROMPT_NAME"
+aliases = ["name"]
+type = "string"
+help = "Reviewed prompt name."
+
+[commands.prompt.flags.report]
+env = "CANONICAL_AUDITOR_PROMPT_REPORT"
+aliases = ["report"]
+type = "string"
+help = "Audit report JSON path."
+
+[commands.prompt.flags.output]
+env = "CANONICAL_AUDITOR_PROMPT_OUTPUT"
+aliases = ["output"]
+short = "o"
+type = "string"
+default = "-"
+help = "Prompt path, or '-' for stdout."
+
+[commands.serve]
+help = "Run the signed inbound assessment and webhook HTTP service."
+
+[commands.serve.flags.bind]
+env = "CANONICAL_AUDITOR_SERVE_BIND"
+aliases = ["bind"]
+type = "string"
+default = "127.0.0.1:8080"
+help = "HTTP listen socket."
+
+[commands.serve.flags.max-body-bytes]
+env = "CANONICAL_AUDITOR_SERVE_MAX_BODY_BYTES"
+aliases = ["max-body-bytes"]
+type = "int"
+default = 1048576
+help = "Maximum JSON request body size."
