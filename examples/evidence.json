@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "canonical.evidence-bundle/v1",
+  "tenantId": "tenant-example",
+  "scopeId": "organization/example",
+  "observations": [
+    {
+      "externalId": "policy-2026-q3",
+      "evidenceType": "governance.policy_inventory",
+      "subject": "organization/example",
+      "source": { "kind": "manual", "submittedBy": "security-owner" },
+      "collectedAt": 1788000000,
+      "validUntil": 1819536000,
+      "facts": { "approved_and_current": true }
+    },
+    {
+      "externalId": "risk-register-2026-q3",
+      "evidenceType": "governance.risk_register",
+      "subject": "organization/example",
+      "source": { "kind": "connector", "connector": "risk-read-only", "adapterVersion": "1.0.0" },
+      "collectedAt": 1788000000,
+      "validUntil": 1796083200,
+      "facts": { "current_and_owned": false }
+    },
+    {
+      "externalId": "applicability-2026",
+      "evidenceType": "governance.applicability",
+      "subject": "organization/example",
+      "source": { "kind": "manual", "submittedBy": "legal-owner" },
+      "collectedAt": 1787000000,
+      "validUntil": 1818536000,
+      "facts": { "reviewed": true }
+    },
+    {
+      "externalId": "assets-2026-08",
+      "evidenceType": "assets.inventory",
+      "subject": "organization/example/system/production-cloud",
+      "source": { "kind": "connector", "connector": "asset-read-only", "adapterVersion": "1.2.0" },
+      "collectedAt": 1788000000,
+      "validUntil": 1790000000,
+      "facts": { "coverage_percent": 92 }
+    },
+    {
+      "externalId": "mfa-2026-08",
+      "evidenceType": "identity.mfa",
+      "subject": "organization/example/workforce",
+      "source": { "kind": "connector", "connector": "idp-read-only", "adapterVersion": "2.0.0" },
+      "collectedAt": 1788000000,
+      "validUntil": 1790000000,
+      "facts": { "coverage_percent": 97 }
+    },
+    {
+      "externalId": "access-review-2026-q3",
+      "evidenceType": "identity.access_review",
+      "subject": "organization/example/workforce",
+      "source": { "kind": "connector", "connector": "iga-read-only", "adapterVersion": "1.0.0" },
+      "collectedAt": 1788000000,
+      "validUntil": 1796083200,
+      "facts": { "days_since_review": 60 }
+    },
+    {
+      "externalId": "classification-2026-08",
+      "evidenceType": "data.classification",
+      "subject": "organization/example/data",
+      "source": { "kind": "connector", "connector": "catalog-read-only", "adapterVersion": "3.1.0" },
+      "collectedAt": 1788000000,
+      "validUntil": 1796083200,
+      "facts": { "coverage_percent": 99 }
+    },
+    {
+      "externalId": "encryption-2026-08",
+      "evidenceType": "data.encryption",
+      "subject": "organization/example/data",
+      "source": { "kind": "connector", "connector": "kms-read-only", "adapterVersion": "1.0.0" },
+      "collectedAt": 1788000000,
+      "validUntil": 1790000000,
+      "facts": { "at_rest_and_in_transit": true }
+    },
+    {
+      "externalId": "retention-2026-q3",
+      "evidenceType": "data.retention",
+      "subject": "organization/example/data",
+      "source": { "kind": "manual", "submittedBy": "data-owner" },
+      "collectedAt": 1788000000,
+      "validUntil": 1796083200,
+      "facts": { "policy_enforced": false }
+    },
+    {
+      "externalId": "vendors-2026-q3",
+      "evidenceType": "vendors.assurance",
+      "subject": "organization/example/vendors",
+      "source": { "kind": "connector", "connector": "vendor-read-only", "adapterVersion": "1.0.0" },
+      "collectedAt": 1788000000,
+      "validUntil": 1796083200,
+      "facts": { "coverage_percent": 75 }
+    },
+    {
+      "externalId": "change-2026-08",
+      "evidenceType": "change.protection",
+      "subject": "organization/example/system/customer-platform",
+      "source": { "kind": "connector", "connector": "scm-read-only", "adapterVersion": "2.3.0" },
+      "collectedAt": 1788000000,
+      "validUntil": 1790000000,
+      "facts": { "protected_path_percent": 100 }
+    },
+    {
+      "externalId": "vulnerabilities-2026-08",
+      "evidenceType": "vulnerability.remediation",
+      "subject": "organization/example/system/customer-platform",
+      "source": { "kind": "connector", "connector": "vulnerability-read-only", "adapterVersion": "4.0.0" },
+      "collectedAt": 1788000000,
+      "validUntil": 1789000000,
+      "facts": { "critical_overdue_count": 2 }
+    },
+    {
+      "externalId": "logging-2026-08",
+      "evidenceType": "logging.coverage",
+      "subject": "organization/example/system/production-cloud",
+      "source": { "kind": "connector", "connector": "siem-read-only", "adapterVersion": "1.4.0" },
+      "collectedAt": 1788000000,
+      "validUntil": 1789000000,
+      "facts": { "coverage_percent": 90 }
+    },
+    {
+      "externalId": "incident-exercise-2025",
+      "evidenceType": "incident.exercise",
+      "subject": "organization/example",
+      "source": { "kind": "manual", "submittedBy": "incident-commander" },
+      "collectedAt": 1788000000,
+      "validUntil": 1796083200,
+      "facts": { "days_since_exercise": 400 }
+    },
+    {
+      "externalId": "restore-test-2026-q3",
+      "evidenceType": "resilience.restore_test",
+      "subject": "organization/example/system/customer-platform",
+      "source": { "kind": "connector", "connector": "backup-read-only", "adapterVersion": "1.0.0" },
+      "collectedAt": 1788000000,
+      "validUntil": 1796083200,
+      "facts": { "days_since_test": 30 }
+    },
+    {
+      "externalId": "training-2026",
+      "evidenceType": "workforce.training",
+      "subject": "organization/example/workforce",
+      "source": { "kind": "connector", "connector": "lms-read-only", "adapterVersion": "1.0.0" },
+      "collectedAt": 1788000000,
+      "validUntil": 1819536000,
+      "facts": { "completion_percent": 97 }
+    },
+    {
+      "externalId": "ai-inventory-2026-q3",
+      "evidenceType": "ai.inventory",
+      "subject": "organization/example/ai",
+      "source": { "kind": "runtime_probe", "runtime": "typescript", "probeVersion": "1.0.0" },
+      "collectedAt": 1788000000,
+      "validUntil": 1796083200,
+      "facts": { "material_use_cases_inventory_complete": true }
+    },
+    {
+      "externalId": "ai-evaluation-2026-q3",
+      "evidenceType": "ai.evaluation",
+      "subject": "organization/example/ai",
+      "source": { "kind": "manual", "submittedBy": "ai-risk-owner" },
+      "collectedAt": 1788000000,
+      "validUntil": 1796083200,
+      "facts": { "material_system_coverage_percent": 50 }
+    }
+  ]
+}

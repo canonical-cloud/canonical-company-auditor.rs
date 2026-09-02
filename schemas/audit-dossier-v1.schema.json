@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://canonical-cloud.dev/schemas/audit-dossier-v1.schema.json",
+  "title": "Canonical audit dossier v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "dossierId",
+    "engagementSha256",
+    "conclusion",
+    "engagement",
+    "readinessReport",
+    "summary",
+    "controlResults",
+    "evidenceIndex",
+    "exceptions",
+    "auditTrail",
+    "limitations"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "canonical.audit-dossier/v1" },
+    "dossierId": { "$ref": "#/$defs/digest" },
+    "engagementSha256": { "$ref": "#/$defs/digest" },
+    "conclusion": {
+      "enum": ["satisfactory", "satisfactory_with_exceptions", "unsatisfactory", "incomplete"]
+    },
+    "engagement": { "$ref": "audit-engagement-v1.schema.json" },
+    "readinessReport": { "$ref": "audit-report-v1.schema.json" },
+    "summary": { "$ref": "#/$defs/summary" },
+    "controlResults": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": { "$ref": "#/$defs/controlResult" }
+    },
+    "evidenceIndex": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": { "$ref": "#/$defs/evidenceIndexEntry" }
+    },
+    "exceptions": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": { "$ref": "#/$defs/exceptionRecord" }
+    },
+    "auditTrail": {
+      "type": "array",
+      "maxItems": 100000,
+      "items": { "$ref": "#/$defs/auditTrailEntry" }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": { "type": "string", "minLength": 1, "maxLength": 4000 }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240,
+      "pattern": "^[A-Za-z0-9_.:@/-]+$"
+    },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "severity": { "enum": ["info", "low", "medium", "high", "critical"] },
+    "findingStatus": { "enum": ["pass", "fail", "unknown"] },
+    "auditStatus": { "enum": ["satisfactory", "exception", "evidence_gap", "not_reviewed"] },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "totalControls",
+        "satisfactoryControls",
+        "exceptionControls",
+        "evidenceGapControls",
+        "notReviewedControls",
+        "evidenceCoverageBasisPoints",
+        "reviewCoverageBasisPoints",
+        "openEvidenceRequests",
+        "totalExceptions",
+        "openExceptions",
+        "managementResponses"
+      ],
+      "properties": {
+        "totalControls": { "type": "integer", "minimum": 0 },
+        "satisfactoryControls": { "type": "integer", "minimum": 0 },
+        "exceptionControls": { "type": "integer", "minimum": 0 },
+        "evidenceGapControls": { "type": "integer", "minimum": 0 },
+        "notReviewedControls": { "type": "integer", "minimum": 0 },
+        "evidenceCoverageBasisPoints": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "reviewCoverageBasisPoints": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "openEvidenceRequests": { "type": "integer", "minimum": 0 },
+        "totalExceptions": { "type": "integer", "minimum": 0 },
+        "openExceptions": { "type": "integer", "minimum": 0 },
+        "managementResponses": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "frameworkMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frameworkId", "reference"],
+      "properties": {
+        "frameworkId": { "$ref": "#/$defs/identifier" },
+        "reference": { "type": "string", "minLength": 1, "maxLength": 120 }
+      }
+    },
+    "controlResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ruleId",
+        "title",
+        "category",
+        "severity",
+        "automatedStatus",
+        "auditStatus",
+        "evidenceIds",
+        "exceptionIds",
+        "frameworkMappings"
+      ],
+      "properties": {
+        "ruleId": { "$ref": "#/$defs/identifier" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "category": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "severity": { "$ref": "#/$defs/severity" },
+        "automatedStatus": { "$ref": "#/$defs/findingStatus" },
+        "auditStatus": { "$ref": "#/$defs/auditStatus" },
+        "workpaperId": { "$ref": "#/$defs/identifier" },
+        "designConclusion": { "enum": ["effective", "ineffective", "not_tested", "not_applicable"] },
+        "operatingConclusion": { "enum": ["effective", "ineffective", "not_tested", "not_applicable"] },
+        "reviewerId": { "$ref": "#/$defs/identifier" },
+        "samplePlanId": { "$ref": "#/$defs/identifier" },
+        "evidenceIds": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": { "$ref": "#/$defs/digest" }
+        },
+        "exceptionIds": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "frameworkMappings": {
+          "type": "array",
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/frameworkMapping" }
+        }
+      }
+    },
+    "evidenceIndexEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observationId",
+        "externalId",
+        "evidenceType",
+        "subject",
+        "sourceKind",
+        "collectedAt",
+        "validUntil",
+        "factsSha256",
+        "attested",
+        "referencedByRuleIds"
+      ],
+      "properties": {
+        "observationId": { "$ref": "#/$defs/digest" },
+        "externalId": { "$ref": "#/$defs/identifier" },
+        "evidenceType": { "$ref": "#/$defs/identifier" },
+        "subject": { "$ref": "#/$defs/identifier" },
+        "sourceKind": { "enum": ["manual", "connector", "runtime_probe"] },
+        "collectedAt": { "type": "integer", "minimum": 0 },
+        "validUntil": { "type": "integer", "minimum": 0 },
+        "factsSha256": { "$ref": "#/$defs/digest" },
+        "attested": { "type": "boolean" },
+        "referencedByRuleIds": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": { "$ref": "#/$defs/identifier" }
+        }
+      }
+    },
+    "exceptionRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ruleId", "workpaperId", "exception"],
+      "properties": {
+        "ruleId": { "$ref": "#/$defs/identifier" },
+        "workpaperId": { "$ref": "#/$defs/identifier" },
+        "exception": { "$ref": "audit-engagement-v1.schema.json#/$defs/exception" },
+        "managementResponse": { "$ref": "audit-engagement-v1.schema.json#/$defs/managementResponse" }
+      }
+    },
+    "auditTrailEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "eventType",
+        "actorId",
+        "occurredAt",
+        "subjectId",
+        "payloadSha256",
+        "entrySha256"
+      ],
+      "properties": {
+        "sequence": { "type": "integer", "minimum": 0 },
+        "eventType": { "$ref": "#/$defs/identifier" },
+        "actorId": { "$ref": "#/$defs/identifier" },
+        "occurredAt": { "type": "integer", "minimum": 0 },
+        "subjectId": { "$ref": "#/$defs/identifier" },
+        "payloadSha256": { "$ref": "#/$defs/digest" },
+        "previousEntrySha256": { "$ref": "#/$defs/digest" },
+        "entrySha256": { "$ref": "#/$defs/digest" }
+      }
+    }
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://canonical.plus/schemas/audit-report-v1.schema.json",
+  "title": "Canonical deterministic audit report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "reportId", "manifestSha256", "evidenceSha256", "programSha256", "manifest", "summary", "findings", "limitations"],
+  "properties": {
+    "schemaVersion": { "const": "canonical.audit-report/v1" },
+    "reportId": { "$ref": "#/$defs/digest" },
+    "manifestSha256": { "$ref": "#/$defs/digest" },
+    "evidenceSha256": { "$ref": "#/$defs/digest" },
+    "programSha256": { "$ref": "#/$defs/digest" },
+    "manifest": { "type": "object" },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passed", "failed", "unknown", "highOrCritical"],
+      "properties": {
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "unknown": { "type": "integer", "minimum": 0 },
+        "highOrCritical": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1, "maxLength": 1000 }
+    }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frameworkId", "reference"],
+      "properties": {
+        "frameworkId": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "reference": { "type": "string", "minLength": 1, "maxLength": 120 }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["findingId", "ruleId", "title", "category", "severity", "status", "subject", "summary", "evidenceIds", "frameworkMappings", "remediation"],
+      "properties": {
+        "findingId": { "$ref": "#/$defs/digest" },
+        "ruleId": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "category": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "severity": { "enum": ["info", "low", "medium", "high", "critical"] },
+        "status": { "enum": ["pass", "fail", "unknown"] },
+        "subject": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "evidenceIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/digest" }
+        },
+        "frameworkMappings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/mapping" }
+        },
+        "remediation": { "type": "string", "minLength": 1, "maxLength": 2000 }
+      }
+    }
+  }
+}

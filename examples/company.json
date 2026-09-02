@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "canonical.company-audit/v1",
+  "tenantId": "tenant-example",
+  "scopeId": "organization/example",
+  "companyName": "Example Company",
+  "frameworks": [
+    "cis-controls-8.1",
+    "gdpr-2016-679",
+    "hipaa-security-rule",
+    "iso-iec-27001-2022",
+    "nist-800-53-r5",
+    "nist-ai-rmf-1.0",
+    "nist-csf-2.0",
+    "pci-dss-4.0.1",
+    "soc2-tsc-2017-2022"
+  ],
+  "assessmentPeriod": {
+    "startsAt": 1756684800,
+    "endsAt": 1788134400
+  },
+  "scope": {
+    "businessUnits": ["Engineering", "Finance", "People", "Security"],
+    "systems": ["Corporate IT", "Customer Platform", "Payments", "Production Cloud"],
+    "dataClasses": ["Cardholder Data", "Employee Data", "Personal Data", "Protected Health Information"],
+    "vendors": ["Cloud Provider", "Identity Provider", "Payment Processor"],
+    "jurisdictions": ["European Union", "United States"],
+    "owners": ["data-protection", "engineering", "executive", "security"]
+  }
+}

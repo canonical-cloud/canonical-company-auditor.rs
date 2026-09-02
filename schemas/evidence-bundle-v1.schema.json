@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://canonical.plus/schemas/evidence-bundle-v1.schema.json",
+  "title": "Canonical framework-neutral evidence bundle v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "tenantId", "scopeId", "observations"],
+  "properties": {
+    "schemaVersion": { "const": "canonical.evidence-bundle/v1" },
+    "tenantId": { "$ref": "#/$defs/identifier" },
+    "scopeId": { "$ref": "#/$defs/scopeId" },
+    "observations": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": { "$ref": "#/$defs/observation" }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[A-Za-z0-9._:@-]+$"
+    },
+    "scopeId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240,
+      "pattern": "^[A-Za-z0-9._:@-]+(?:/[A-Za-z0-9._:@-]+)*$"
+    },
+    "source": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "submittedBy"],
+          "properties": {
+            "kind": { "const": "manual" },
+            "submittedBy": { "$ref": "#/$defs/identifier" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "connector", "adapterVersion"],
+          "properties": {
+            "kind": { "const": "connector" },
+            "connector": { "$ref": "#/$defs/identifier" },
+            "adapterVersion": { "$ref": "#/$defs/identifier" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "runtime", "probeVersion"],
+          "properties": {
+            "kind": { "const": "runtime_probe" },
+            "runtime": { "$ref": "#/$defs/identifier" },
+            "probeVersion": { "$ref": "#/$defs/identifier" }
+          }
+        }
+      ]
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["externalId", "evidenceType", "subject", "source", "collectedAt", "validUntil", "facts"],
+      "properties": {
+        "externalId": { "$ref": "#/$defs/identifier" },
+        "evidenceType": { "$ref": "#/$defs/identifier" },
+        "subject": { "$ref": "#/$defs/scopeId" },
+        "source": { "$ref": "#/$defs/source" },
+        "collectedAt": { "type": "integer", "minimum": 0 },
+        "validUntil": { "type": "integer", "minimum": 0 },
+        "facts": { "type": "object", "maxProperties": 256 },
+        "attestation": { "type": "string", "minLength": 1, "maxLength": 512 }
+      }
+    }
+  }
+}

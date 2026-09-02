@@ -1,0 +1,12 @@
+/target/
+/reports/
+/tmp/
+/env/dec/
+.DS_Store
+*.log
+*.pem
+*.key
+.env
+node_modules/
+__pycache__/
+*.pyc
