@@ -10,3 +10,8 @@
 node_modules/
 __pycache__/
 *.pyc
+
+# Repository-local temporary data and authorized Git worktrees
+temp
+tmp/worktrees
+temp/worktrees
