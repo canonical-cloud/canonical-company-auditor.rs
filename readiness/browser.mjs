@@ -60,7 +60,7 @@ $('import').addEventListener('change', async (event) => {
   const file = event.target.files[0]; if (!file) return;
   try {
     if (file.size > MAX_BYTES) throw new Error('Response exceeds the 1 MiB limit');
-    const incoming = importDraft(catalog, selected.id, context, new TextDecoder('utf-8', { fatal: true }).decode(await file.arrayBuffer()));
+    const incoming = importDraft(catalog, selected.id, context, new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(await file.arrayBuffer()));
     if (dirty && draft.answers.some((answer) => answer.status !== 'unanswered' || answer.notes) && !window.confirm('Replace this tab’s unsaved answers with the matching imported draft?')) return;
     draft = incoming; dirty = true; renderQuestions();
   } catch (cause) { error(cause.message); }
