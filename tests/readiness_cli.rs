@@ -8,8 +8,14 @@ use serde_json::{Value, json};
 
 fn run(context: &Path, output: &Path, responses: Option<&Path>) -> Result<Output, std::io::Error> {
     let mut command = Command::new(env!("CARGO_BIN_EXE_canonical-auditor"));
-    command.env_clear().args(["readiness", "--framework", "soc2", "--format", "json"]);
-    command.arg("--context").arg(context).arg("--output").arg(output);
+    command
+        .env_clear()
+        .args(["readiness", "--framework", "soc2", "--format", "json"]);
+    command
+        .arg("--context")
+        .arg(context)
+        .arg("--output")
+        .arg(output);
     if let Some(path) = responses {
         command.arg("--responses").arg(path);
     }
@@ -20,7 +26,10 @@ fn run(context: &Path, output: &Path, responses: Option<&Path>) -> Result<Output
 fn export_assess_and_refuse_overwrite() -> Result<(), Box<dyn Error>> {
     let directory = tempfile::tempdir()?;
     let context = directory.path().join("context.json");
-    fs::write(&context, include_bytes!("../readiness/context.example.json"))?;
+    fs::write(
+        &context,
+        include_bytes!("../readiness/context.example.json"),
+    )?;
     let answers = directory.path().join("answers.json");
     assert!(run(&context, &answers, None)?.status.success());
     let original = fs::read(&answers)?;
@@ -29,7 +38,10 @@ fn export_assess_and_refuse_overwrite() -> Result<(), Box<dyn Error>> {
     assert!(!run(&context, &answers, None)?.status.success());
     assert_eq!(fs::read(&answers)?, original);
     let report = directory.path().join("report.json");
-    assert_eq!(run(&context, &report, Some(&answers))?.status.code(), Some(2));
+    assert_eq!(
+        run(&context, &report, Some(&answers))?.status.code(),
+        Some(2)
+    );
     let result: Value = serde_json::from_slice(&fs::read(report)?)?;
     assert_eq!(result["summary"]["answered"], 0);
     assert_eq!(result["summary"]["total"], 10);
@@ -41,7 +53,10 @@ fn export_assess_and_refuse_overwrite() -> Result<(), Box<dyn Error>> {
 fn mismatch_and_bad_customer_data_never_write_a_report() -> Result<(), Box<dyn Error>> {
     let directory = tempfile::tempdir()?;
     let context = directory.path().join("context.json");
-    fs::write(&context, include_bytes!("../readiness/context.example.json"))?;
+    fs::write(
+        &context,
+        include_bytes!("../readiness/context.example.json"),
+    )?;
     let answers = directory.path().join("answers.json");
     assert!(run(&context, &answers, None)?.status.success());
     let original: Value = serde_json::from_slice(&fs::read(&answers)?)?;

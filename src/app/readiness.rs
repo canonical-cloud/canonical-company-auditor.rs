@@ -113,7 +113,8 @@ struct Summary {
 fn invalid() -> AuditError {
     AuditError::Invalid {
         field: "readiness",
-        reason: "invalid packet, framework/version, context, answer, date or input limit".to_owned(),
+        reason: "invalid packet, framework/version, context, answer, date or input limit"
+            .to_owned(),
     }
 }
 
@@ -494,10 +495,13 @@ mod tests {
             wrong.framework_id = "other-framework".to_owned();
             assert!(validate(&catalog, framework, &context, &wrong).is_err());
             wrong = response.clone();
-            wrong.answers[1].question_id.clone_from(&response.answers[0].question_id);
+            wrong.answers[1]
+                .question_id
+                .clone_from(&response.answers[0].question_id);
             assert!(validate(&catalog, framework, &context, &wrong).is_err());
             wrong = response;
-            wrong.answers[0].evidence_ref = "https://example.invalid/private?credential=x".to_owned();
+            wrong.answers[0].evidence_ref =
+                "https://example.invalid/private?credential=x".to_owned();
             assert!(validate(&catalog, framework, &context, &wrong).is_err());
         }
         Ok(())
@@ -505,7 +509,13 @@ mod tests {
 
     #[test]
     fn dates_and_markdown_are_fail_closed() {
-        for value in ["2026-02-29", "1899-12-31", "2026-13-01", "2026-01-00", "2026-1-01"] {
+        for value in [
+            "2026-02-29",
+            "1899-12-31",
+            "2026-13-01",
+            "2026-01-00",
+            "2026-1-01",
+        ] {
             assert!(!valid_date(value));
         }
         assert!(blank_text("\u{feff}"));
