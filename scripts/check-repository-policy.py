@@ -213,9 +213,21 @@ def check_probe_boundaries() -> None:
     for forbidden in ("subprocess", "shell=True", "eval(", "exec("):
         if forbidden in python_probe:
             fail(f"Python runtime probe contains forbidden execution primitive: {forbidden}")
-    for forbidden in ("child_process", "eval(", "new Function("):
-        if forbidden in typescript_probe:
+    # A narrowly reviewed fixed-process launcher replaces in-process customer
+    # imports. It captures native fd output and enforces a deadline. Never
+    # expand this exception into a shell or a general executable collector.
+    worker = load_text(ROOT / "probes" / "typescript" / "runtime-probe-worker.mjs")
+    for forbidden in ("eval(", "new Function(", "shell:", "exec(", "execFile("):
+        if forbidden in typescript_probe or forbidden in worker:
             fail(f"TypeScript runtime probe contains forbidden execution primitive: {forbidden}")
+    fixed_spawn = "spawn(process.execPath, ['--max-old-space-size=128', fileURLToPath(new URL('./runtime-probe-worker.mjs', import.meta.url))]"
+    if typescript_probe.count("spawn(") != 1 or fixed_spawn not in typescript_probe:
+        fail("probe must spawn only the fixed internal Node entrypoint")
+    for required in ("CANONICAL_PROBE_ALLOW_IMPORT", "probe deadline exceeded", "probe output limit exceeded", "probe result limit exceeded", "safeReport("):
+        if required not in typescript_probe:
+            fail(f"probe launcher lacks {required}")
+    if "child_process" in worker:
+        fail("internal probe worker may not create further subprocesses")
     if "no inspected value is emitted" not in python_probe.lower():
         fail("Python probe lacks its value-disclosure invariant")
     if "no inspected value is emitted" not in typescript_probe.lower():
