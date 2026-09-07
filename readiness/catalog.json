@@ -1,0 +1,292 @@
+{
+  "version": "2026-09-07.1",
+  "reviewedOn": "2026-09-07",
+  "notice": "Original Canonical Cloud readiness prompts. Not exhaustive normative controls, certification, legal advice, a completed regulatory questionnaire, or independent assurance. Complete each framework independently.",
+  "frameworks": [
+    {
+      "id": "soc2",
+      "title": "SOC 2",
+      "edition": "2017 TSC; revised points of focus 2022",
+      "scopeNote": "Select Type I or Type II, service boundaries, reporting period and applicable trust services categories with the CPA. This is not a SOC report.",
+      "sources": ["https://www.aicpa-cima.com/resources/download/2017-trust-services-criteria-with-revised-points-of-focus-2022", "https://www.aicpa-cima.com/resources/download/get-description-criteria-for-your-organizations-soc-2-r-report"],
+      "questions": [
+        {"id": "soc2.q01", "prompt": "Have you agreed the service boundary, report type, categories and examination period?", "evidence": "Engagement scope and category selection.", "method": "examine"},
+        {"id": "soc2.q02", "prompt": "Does the system description identify commitments, components, dependencies and customer responsibilities?", "evidence": "Versioned system description and service commitments.", "method": "examine"},
+        {"id": "soc2.q03", "prompt": "Can leadership demonstrate ownership, oversight and escalation of control failures?", "evidence": "Governance minutes, role assignments and escalation examples.", "method": "interview"},
+        {"id": "soc2.q04", "prompt": "Are service risks assessed and linked to operating controls and remediation owners?", "evidence": "Risk register and treatment decisions.", "method": "examine"},
+        {"id": "soc2.q05", "prompt": "Do joiner, mover, leaver and privileged-access samples support the access policy?", "evidence": "Dated access approvals and revocation samples.", "method": "test"},
+        {"id": "soc2.q06", "prompt": "Can sampled production changes be traced through approval, testing and deployment?", "evidence": "Change population and independently selected samples.", "method": "test"},
+        {"id": "soc2.q07", "prompt": "Are monitoring alerts investigated and incidents escalated according to commitments?", "evidence": "Alert tickets, incident records and response exercise.", "method": "test"},
+        {"id": "soc2.q08", "prompt": "Are relevant subservice organizations evaluated and their responsibilities explicitly addressed?", "evidence": "Supplier reviews, reports and complementary controls.", "method": "examine"},
+        {"id": "soc2.q09", "prompt": "Do recovery and processing tests support the selected availability or integrity commitments?", "evidence": "Restore results and processing reconciliation samples.", "method": "test"},
+        {"id": "soc2.q10", "prompt": "Have control exceptions and evidence gaps been reviewed across the intended reporting period?", "evidence": "Exception log, sample rationale and remediation retests.", "method": "examine"}
+      ]
+    },
+    {
+      "id": "nist-csf2",
+      "title": "NIST Cybersecurity Framework",
+      "edition": "CSF 2.0",
+      "scopeNote": "Use Current and Target Profiles appropriate to the organization. A Profile or Tier is not certification or a universal maturity score.",
+      "sources": ["https://www.nist.gov/cyberframework/profiles", "https://www.nist.gov/cyberframework"],
+      "questions": [
+        {"id": "nist-csf2.q01", "prompt": "Are the organizational context, critical services and Current Profile documented?", "evidence": "Scope, stakeholder needs and Current Profile.", "method": "examine"},
+        {"id": "nist-csf2.q02", "prompt": "Are cybersecurity strategy, responsibilities and risk tolerance approved by leadership?", "evidence": "Governance charter and risk appetite decisions.", "method": "interview"},
+        {"id": "nist-csf2.q03", "prompt": "Does the asset inventory identify owners, dependencies and sensitive information?", "evidence": "Hardware, software, service and data inventories.", "method": "examine"},
+        {"id": "nist-csf2.q04", "prompt": "Are threat and vulnerability assessments used to prioritize the Target Profile?", "evidence": "Risk analysis and prioritized Target Profile gaps.", "method": "examine"},
+        {"id": "nist-csf2.q05", "prompt": "Are supplier security expectations established and monitored throughout the relationship?", "evidence": "Supplier requirements, due diligence and monitoring.", "method": "examine"},
+        {"id": "nist-csf2.q06", "prompt": "Have access, authentication and workforce-awareness protections been tested?", "evidence": "Access samples, authentication configurations and training records.", "method": "test"},
+        {"id": "nist-csf2.q07", "prompt": "Do protective configurations, maintenance and backups cover critical services?", "evidence": "Configuration baselines, patch evidence and restore tests.", "method": "test"},
+        {"id": "nist-csf2.q08", "prompt": "Can detection processes identify and triage adverse events?", "evidence": "Telemetry coverage and alert-triage exercise.", "method": "test"},
+        {"id": "nist-csf2.q09", "prompt": "Have incident response and recovery plans been exercised with responsible participants?", "evidence": "Exercise timeline, communications and recovery outcomes.", "method": "test"},
+        {"id": "nist-csf2.q10", "prompt": "Are Profile gaps assigned, resourced, measured and reassessed after material changes?", "evidence": "Improvement plan, owners and review cadence.", "method": "interview"}
+      ]
+    },
+    {
+      "id": "iso27001",
+      "title": "ISO/IEC 27001",
+      "edition": "2022 with Amendment 1:2024",
+      "scopeNote": "Use the licensed standard and an agreed ISMS scope. Original prompts do not reproduce Annex A or substitute for certification audits.",
+      "sources": ["https://www.iso.org/standard/27001", "https://www.iso.org/standard/88435.html"],
+      "questions": [
+        {"id": "iso27001.q01", "prompt": "Is the ISMS scope justified against business context and interested-party requirements?", "evidence": "Approved scope, context analysis and requirements register.", "method": "examine"},
+        {"id": "iso27001.q02", "prompt": "Has leadership assigned security responsibilities and measurable ISMS objectives?", "evidence": "Policy approval, responsibilities and objective measures.", "method": "interview"},
+        {"id": "iso27001.q03", "prompt": "Is the information-security risk assessment method consistently applied?", "evidence": "Risk criteria, asset scope and assessment records.", "method": "examine"},
+        {"id": "iso27001.q04", "prompt": "Are treatment decisions and the Statement of Applicability justified and maintained?", "evidence": "Risk treatment plan and licensed-control applicability record.", "method": "examine"},
+        {"id": "iso27001.q05", "prompt": "Are competence, awareness and controlled documentation maintained for the ISMS?", "evidence": "Competence records and document control history.", "method": "examine"},
+        {"id": "iso27001.q06", "prompt": "Do sampled operations demonstrate that selected controls are implemented?", "evidence": "Operational samples linked to selected controls.", "method": "test"},
+        {"id": "iso27001.q07", "prompt": "Are supplier and change-related information-security risks managed?", "evidence": "Supplier assessments and change risk reviews.", "method": "examine"},
+        {"id": "iso27001.q08", "prompt": "Has an impartial internal audit covered the scoped ISMS?", "evidence": "Audit program, competence, workpapers and findings.", "method": "examine"},
+        {"id": "iso27001.q09", "prompt": "Does management review assess performance, changes and improvement opportunities?", "evidence": "Management review inputs, minutes and decisions.", "method": "interview"},
+        {"id": "iso27001.q10", "prompt": "Are corrective actions effective, and has climate-change relevance been considered?", "evidence": "Root-cause retests and documented context consideration.", "method": "test"}
+      ]
+    },
+    {
+      "id": "gdpr",
+      "title": "EU GDPR",
+      "edition": "Regulation (EU) 2016/679",
+      "scopeNote": "Determine territorial scope, controller/processor roles and applicable national rules with privacy counsel. Readiness is not a legal compliance opinion.",
+      "sources": ["https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng", "https://www.edpb.europa.eu/sme_en"],
+      "questions": [
+        {"id": "gdpr.q01", "prompt": "Have processing activities, purposes, data flows and controller/processor roles been mapped?", "evidence": "Processing inventory and role determinations.", "method": "examine"},
+        {"id": "gdpr.q02", "prompt": "Is a defensible lawful basis recorded for each purpose, including sensitive-data conditions?", "evidence": "Purpose-level basis analysis and consent records.", "method": "examine"},
+        {"id": "gdpr.q03", "prompt": "Do notices accurately explain actual processing and required rights information?", "evidence": "Published notices and processing-to-notice reconciliation.", "method": "examine"},
+        {"id": "gdpr.q04", "prompt": "Can requests for applicable individual rights be authenticated and fulfilled?", "evidence": "Rights-request procedure and timed case samples.", "method": "test"},
+        {"id": "gdpr.q05", "prompt": "Are collection limits, retention periods and deletion procedures enforced?", "evidence": "Retention schedule, minimization decisions and deletion tests.", "method": "test"},
+        {"id": "gdpr.q06", "prompt": "Are processor contracts and subprocessors controlled for the actual services?", "evidence": "Processing agreements, instructions and subprocessor records.", "method": "examine"},
+        {"id": "gdpr.q07", "prompt": "Have international transfers and the relevant safeguards been assessed?", "evidence": "Transfer inventory, mechanism and supporting assessment.", "method": "examine"},
+        {"id": "gdpr.q08", "prompt": "Are security measures proportionate to personal-data risks and regularly reviewed?", "evidence": "Security risk assessment and effectiveness tests.", "method": "test"},
+        {"id": "gdpr.q09", "prompt": "Are high-risk processing, DPIA duties and DPO requirements assessed?", "evidence": "Screening decisions, DPIAs and responsibility assignments.", "method": "examine"},
+        {"id": "gdpr.q10", "prompt": "Can personal-data breaches be assessed, documented and notified when required?", "evidence": "Breach decision log and notification exercise.", "method": "test"}
+      ]
+    },
+    {
+      "id": "hipaa",
+      "title": "HIPAA",
+      "edition": "Applicable 45 CFR Parts 160 and 164",
+      "scopeNote": "Determine covered-entity/business-associate status and applicable Privacy, Security and Breach Notification duties. Proposed rule changes are not assumed effective.",
+      "sources": ["https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html", "https://www.hhs.gov/hipaa/for-professionals/security/guidance/guidance-risk-analysis/index.html"],
+      "questions": [
+        {"id": "hipaa.q01", "prompt": "Are regulated roles and all locations of PHI and ePHI identified?", "evidence": "Role determination and PHI/ePHI data-flow inventory.", "method": "examine"},
+        {"id": "hipaa.q02", "prompt": "Does the risk analysis cover all scoped ePHI and relevant threats?", "evidence": "Current risk analysis, methodology and completeness review.", "method": "examine"},
+        {"id": "hipaa.q03", "prompt": "Are risk treatment decisions and addressable-specification rationales documented?", "evidence": "Risk management plan and reasoned safeguard decisions.", "method": "examine"},
+        {"id": "hipaa.q04", "prompt": "Are security responsibility, workforce training and sanction procedures established?", "evidence": "Assigned officials, training samples and workforce procedures.", "method": "interview"},
+        {"id": "hipaa.q05", "prompt": "Are workforce access authorization and termination controls effective?", "evidence": "Access approvals, unique identities and termination samples.", "method": "test"},
+        {"id": "hipaa.q06", "prompt": "Do facility, workstation and device/media safeguards protect ePHI?", "evidence": "Physical review, device controls and disposal evidence.", "method": "test"},
+        {"id": "hipaa.q07", "prompt": "Do technical safeguards address access, integrity, auditability and transmission risks?", "evidence": "Configuration evidence and audit-control test results.", "method": "test"},
+        {"id": "hipaa.q08", "prompt": "Can contingency procedures restore ePHI and sustain critical operations?", "evidence": "Backup, recovery and emergency-mode exercise records.", "method": "test"},
+        {"id": "hipaa.q09", "prompt": "Are business-associate arrangements and privacy-use restrictions operational?", "evidence": "Business-associate agreements and disclosure procedures.", "method": "examine"},
+        {"id": "hipaa.q10", "prompt": "Can suspected breaches be investigated and required notifications coordinated?", "evidence": "Incident-to-breach workflow and notification exercise.", "method": "test"}
+      ]
+    },
+    {
+      "id": "pci-dss",
+      "title": "PCI DSS",
+      "edition": "4.0.1",
+      "scopeNote": "Confirm cardholder-data scope and SAQ/ROC eligibility with the acquirer or payment brands. This is not an official SAQ, ROC or attestation.",
+      "sources": ["https://www.pcisecuritystandards.org/document_library/", "https://blog.pcisecuritystandards.org/pci-dss-v4-0-resource-hub"],
+      "questions": [
+        {"id": "pci-dss.q01", "prompt": "Are payment flows, the cardholder-data environment and scope-reducing claims validated?", "evidence": "Payment diagrams, inventories and segmentation evidence.", "method": "examine"},
+        {"id": "pci-dss.q02", "prompt": "Are network boundaries and secure configurations maintained and tested?", "evidence": "Network rule reviews and configuration samples.", "method": "test"},
+        {"id": "pci-dss.q03", "prompt": "Are stored account data, retention and cryptographic keys appropriately controlled?", "evidence": "Data discovery, retention and key-management records.", "method": "test"},
+        {"id": "pci-dss.q04", "prompt": "Are transmissions over relevant networks protected and monitored?", "evidence": "Transport configurations and certificate review.", "method": "test"},
+        {"id": "pci-dss.q05", "prompt": "Are malware defenses and secure development practices operating?", "evidence": "Defense coverage and development security samples.", "method": "test"},
+        {"id": "pci-dss.q06", "prompt": "Do access restrictions, identity controls and applicable MFA requirements work?", "evidence": "Role reviews and authentication test results.", "method": "test"},
+        {"id": "pci-dss.q07", "prompt": "Are physical access and visitor handling appropriate to payment systems?", "evidence": "Access logs and physical inspection records.", "method": "examine"},
+        {"id": "pci-dss.q08", "prompt": "Can audit logs support investigation and timely response?", "evidence": "Log coverage, retention and investigation samples.", "method": "test"},
+        {"id": "pci-dss.q09", "prompt": "Are vulnerability scans, penetration tests and payment-page protections assessed where applicable?", "evidence": "Authorized test reports and relevant payment-page evidence.", "method": "test"},
+        {"id": "pci-dss.q10", "prompt": "Are service providers, targeted risk analyses and incident duties documented?", "evidence": "Responsibility matrix, risk analyses and incident exercise.", "method": "examine"}
+      ]
+    },
+    {
+      "id": "cis-controls",
+      "title": "CIS Critical Security Controls",
+      "edition": "v8.1",
+      "scopeNote": "Select an Implementation Group and use the current CIS assessment specification. Original prompts are not a safeguard-by-safeguard CIS attestation.",
+      "sources": ["https://www.cisecurity.org/controls/v8-1", "https://www.cisecurity.org/controls/cis-controls-assessment-specification"],
+      "questions": [
+        {"id": "cis-controls.q01", "prompt": "Is the selected Implementation Group justified for organizational risk and resources?", "evidence": "Implementation Group rationale and scoped safeguard list.", "method": "examine"},
+        {"id": "cis-controls.q02", "prompt": "Are enterprise assets and installed software inventoried and reconciled?", "evidence": "Inventories and unauthorized-asset handling samples.", "method": "test"},
+        {"id": "cis-controls.q03", "prompt": "Are data inventories, handling requirements and protection measures enforced?", "evidence": "Data classification and protection evidence.", "method": "examine"},
+        {"id": "cis-controls.q04", "prompt": "Are secure configurations and vulnerability remediation maintained?", "evidence": "Baseline checks, vulnerability backlog and remediation samples.", "method": "test"},
+        {"id": "cis-controls.q05", "prompt": "Are account lifecycle and access-control practices consistently applied?", "evidence": "Account reviews and privilege-removal tests.", "method": "test"},
+        {"id": "cis-controls.q06", "prompt": "Do audit logging and monitoring cover important security events?", "evidence": "Log sources, retention and event-review samples.", "method": "test"},
+        {"id": "cis-controls.q07", "prompt": "Are browser, email, malware and network defenses configured effectively?", "evidence": "Defense configurations and controlled test results.", "method": "test"},
+        {"id": "cis-controls.q08", "prompt": "Can recovery procedures restore critical services and information?", "evidence": "Backup inventory and restoration exercise.", "method": "test"},
+        {"id": "cis-controls.q09", "prompt": "Are personnel, service providers and application-development risks addressed?", "evidence": "Training, provider reviews and development evidence.", "method": "examine"},
+        {"id": "cis-controls.q10", "prompt": "Do incident exercises and authorized penetration tests feed measured improvements?", "evidence": "Exercise findings, test scope and retest results.", "method": "test"}
+      ]
+    },
+    {
+      "id": "csa-ccm",
+      "title": "CSA Cloud Controls Matrix",
+      "edition": "CCM / CAIQ v4.1",
+      "scopeNote": "Select cloud services and shared responsibilities. This is an original readiness questionnaire, not a completed CAIQ or a STAR certification.",
+      "sources": ["https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4-1", "https://cloudsecurityalliance.org/artifacts/star-level-1-security-questionnaire-caiq-v4-1"],
+      "questions": [
+        {"id": "csa-ccm.q01", "prompt": "Are cloud service boundaries and provider/customer responsibilities explicit?", "evidence": "Service inventory and shared-responsibility matrix.", "method": "examine"},
+        {"id": "csa-ccm.q02", "prompt": "Are cloud governance, assurance and risk-management roles established?", "evidence": "Governance decisions and cloud risk register.", "method": "interview"},
+        {"id": "csa-ccm.q03", "prompt": "Are data location, lifecycle and privacy obligations understood?", "evidence": "Data-flow, residency and deletion evidence.", "method": "examine"},
+        {"id": "csa-ccm.q04", "prompt": "Are cloud identities, privileged roles and cryptographic keys controlled?", "evidence": "Role reviews, key ownership and access tests.", "method": "test"},
+        {"id": "csa-ccm.q05", "prompt": "Do infrastructure, virtualization and tenant-isolation controls match the service model?", "evidence": "Architecture, isolation tests and configuration evidence.", "method": "test"},
+        {"id": "csa-ccm.q06", "prompt": "Are application interfaces and workload changes developed and deployed securely?", "evidence": "API inventory and secure delivery samples.", "method": "test"},
+        {"id": "csa-ccm.q07", "prompt": "Are monitoring, vulnerability handling and incident coordination effective?", "evidence": "Cloud telemetry coverage and incident exercise.", "method": "test"},
+        {"id": "csa-ccm.q08", "prompt": "Are business continuity and portability or exit arrangements tested?", "evidence": "Recovery, export and service-exit exercises.", "method": "test"},
+        {"id": "csa-ccm.q09", "prompt": "Are suppliers, facilities and organizational personnel covered by assurance activities?", "evidence": "Supplier assessments and operational assurance records.", "method": "examine"},
+        {"id": "csa-ccm.q10", "prompt": "Are proposed CAIQ answers independently substantiated for this specific offering?", "evidence": "Question-level evidence and reviewer notes.", "method": "examine"}
+      ]
+    },
+    {
+      "id": "iso27701",
+      "title": "ISO/IEC 27701",
+      "edition": "2025",
+      "scopeNote": "Use the 2025 PIMS requirements and determine PII-controller/processor roles. Do not silently treat the withdrawn 2019 edition as current.",
+      "sources": ["https://www.iso.org/standard/27701", "https://www.iso.org/standard/71670.html"],
+      "questions": [
+        {"id": "iso27701.q01", "prompt": "Are the privacy management system scope and PII roles documented?", "evidence": "PIMS scope and role inventory.", "method": "examine"},
+        {"id": "iso27701.q02", "prompt": "Are privacy obligations and interested-party expectations tracked?", "evidence": "Obligations register and stakeholder analysis.", "method": "examine"},
+        {"id": "iso27701.q03", "prompt": "Has leadership assigned privacy responsibilities and measurable objectives?", "evidence": "Governance records and privacy objectives.", "method": "interview"},
+        {"id": "iso27701.q04", "prompt": "Are privacy risks assessed and treatment decisions recorded?", "evidence": "Privacy risk assessments and treatment plan.", "method": "examine"},
+        {"id": "iso27701.q05", "prompt": "Are processing purposes, data categories and information flows maintained?", "evidence": "Processing records and data-flow review.", "method": "examine"},
+        {"id": "iso27701.q06", "prompt": "Do operational procedures implement relevant controller obligations?", "evidence": "Controller procedure samples and rights handling.", "method": "test"},
+        {"id": "iso27701.q07", "prompt": "Do processor practices follow authorized instructions and supplier obligations?", "evidence": "Processor instructions, contracts and subprocessor checks.", "method": "test"},
+        {"id": "iso27701.q08", "prompt": "Are sharing, transfer, retention and deletion practices evidenced?", "evidence": "Transfer records and retention/deletion tests.", "method": "test"},
+        {"id": "iso27701.q09", "prompt": "Have privacy incidents, competence and awareness been evaluated?", "evidence": "Incident exercise and competence records.", "method": "interview"},
+        {"id": "iso27701.q10", "prompt": "Do internal audit, management review and corrective actions improve the PIMS?", "evidence": "Audit workpapers, review decisions and retests.", "method": "examine"}
+      ]
+    },
+    {
+      "id": "iso42001",
+      "title": "ISO/IEC 42001",
+      "edition": "2023",
+      "scopeNote": "Define the AI management system scope and organizational role. This is not AI safety certification or a substitute for applicable AI laws.",
+      "sources": ["https://www.iso.org/standard/42001", "https://www.iso.org/sectors/it-technologies/ai"],
+      "questions": [
+        {"id": "iso42001.q01", "prompt": "Are scoped AI systems, organizational roles and affected stakeholders identified?", "evidence": "AI inventory and management-system scope.", "method": "examine"},
+        {"id": "iso42001.q02", "prompt": "Are AI policy, accountability and objectives approved by leadership?", "evidence": "Policy, role assignments and measurable objectives.", "method": "interview"},
+        {"id": "iso42001.q03", "prompt": "Are AI risks and potential impacts assessed across the lifecycle?", "evidence": "Risk and impact assessments with review history.", "method": "examine"},
+        {"id": "iso42001.q04", "prompt": "Are treatment controls selected and their applicability justified?", "evidence": "Treatment plan and control applicability rationale.", "method": "examine"},
+        {"id": "iso42001.q05", "prompt": "Are data provenance, quality and authorized use documented?", "evidence": "Data documentation and quality evaluation samples.", "method": "test"},
+        {"id": "iso42001.q06", "prompt": "Are development, evaluation and release decisions reproducible?", "evidence": "Evaluation plans, results and release approvals.", "method": "test"},
+        {"id": "iso42001.q07", "prompt": "Are human oversight, user information and escalation mechanisms operational?", "evidence": "Oversight procedure and escalation exercises.", "method": "test"},
+        {"id": "iso42001.q08", "prompt": "Are third-party AI components and dependencies evaluated?", "evidence": "Supplier evaluations and responsibility agreements.", "method": "examine"},
+        {"id": "iso42001.q09", "prompt": "Are deployed systems monitored for changing risks and incidents?", "evidence": "Monitoring criteria and incident/change records.", "method": "test"},
+        {"id": "iso42001.q10", "prompt": "Do internal audit, management review and corrective action improve the system?", "evidence": "Audit findings, management decisions and retests.", "method": "examine"}
+      ]
+    },
+    {
+      "id": "nist-80053",
+      "title": "NIST SP 800-53",
+      "edition": "Rev. 5; assess with SP 800-53A Rev. 5",
+      "scopeNote": "Select and tailor the applicable baseline; the full control catalog is not automatically required for every organization. No federal authorization is implied.",
+      "sources": ["https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final", "https://csrc.nist.gov/pubs/sp/800/53/a/r5/final"],
+      "questions": [
+        {"id": "nist-80053.q01", "prompt": "Are system boundaries, information types and baseline-selection decisions documented?", "evidence": "System inventory and categorization/tailoring rationale.", "method": "examine"},
+        {"id": "nist-80053.q02", "prompt": "Are applicable controls and organization-defined parameters explicitly selected?", "evidence": "Tailored baseline and parameter assignments.", "method": "examine"},
+        {"id": "nist-80053.q03", "prompt": "Does the system security/privacy plan describe actual control implementation?", "evidence": "Versioned plan and implementation evidence.", "method": "examine"},
+        {"id": "nist-80053.q04", "prompt": "Are common, inherited, hybrid and system-specific responsibilities established?", "evidence": "Control responsibility and inheritance evidence.", "method": "interview"},
+        {"id": "nist-80053.q05", "prompt": "Does the assessment plan specify methods, objects, depth and coverage?", "evidence": "Assessment plan and authorized test scope.", "method": "examine"},
+        {"id": "nist-80053.q06", "prompt": "Do identity and access samples support selected control objectives?", "evidence": "Access-control workpapers and samples.", "method": "test"},
+        {"id": "nist-80053.q07", "prompt": "Do configuration, vulnerability and change tests address selected controls?", "evidence": "Technical workpapers and selected populations.", "method": "test"},
+        {"id": "nist-80053.q08", "prompt": "Are incident response and contingency controls exercised?", "evidence": "Incident and recovery test records.", "method": "test"},
+        {"id": "nist-80053.q09", "prompt": "Are findings recorded with evidence, risk, owners and correction plans?", "evidence": "Assessment findings and action milestones.", "method": "examine"},
+        {"id": "nist-80053.q10", "prompt": "Does continuous monitoring address changing risks and control performance?", "evidence": "Monitoring strategy and reassessment results.", "method": "interview"}
+      ]
+    },
+    {
+      "id": "nist-800171",
+      "title": "NIST SP 800-171",
+      "edition": "Rev. 3; assess with SP 800-171A Rev. 3",
+      "scopeNote": "Confirm the contractually required revision and CUI boundary. Rev. 3 readiness is not a CMMC assessment or proof of a Rev. 2 contractual requirement.",
+      "sources": ["https://csrc.nist.gov/pubs/sp/800/171/r3/final", "https://csrc.nist.gov/pubs/sp/800/171/a/r3/final"],
+      "questions": [
+        {"id": "nist-800171.q01", "prompt": "Have applicable contracts, CUI categories and required publication revisions been confirmed?", "evidence": "Contract interpretation and CUI scope determination.", "method": "examine"},
+        {"id": "nist-800171.q02", "prompt": "Are CUI processing, storage, transmission and external connections mapped?", "evidence": "CUI data flows and system inventory.", "method": "examine"},
+        {"id": "nist-800171.q03", "prompt": "Are security requirements, parameters and implementation responsibilities recorded?", "evidence": "System security plan and parameter decisions.", "method": "examine"},
+        {"id": "nist-800171.q04", "prompt": "Do access and authentication controls restrict CUI to authorized users?", "evidence": "Access review and authentication test samples.", "method": "test"},
+        {"id": "nist-800171.q05", "prompt": "Are audit, monitoring and incident-handling processes effective for CUI systems?", "evidence": "Logs, alert handling and incident exercises.", "method": "test"},
+        {"id": "nist-800171.q06", "prompt": "Are configurations, flaws and system changes securely managed?", "evidence": "Baselines, remediation evidence and change samples.", "method": "test"},
+        {"id": "nist-800171.q07", "prompt": "Do communications, cryptographic protections and media handling address CUI risks?", "evidence": "Transport, media and cryptographic evidence.", "method": "test"},
+        {"id": "nist-800171.q08", "prompt": "Are physical, personnel and supplier dependencies considered?", "evidence": "Facility, workforce and supplier assurance records.", "method": "examine"},
+        {"id": "nist-800171.q09", "prompt": "Are assessment objectives tested using appropriate evidence and sampling?", "evidence": "Assessment procedures, workpapers and sample rationale.", "method": "test"},
+        {"id": "nist-800171.q10", "prompt": "Are remaining deficiencies and ongoing monitoring assigned and tracked?", "evidence": "Corrective action plan and reassessment records.", "method": "examine"}
+      ]
+    },
+    {
+      "id": "nis2",
+      "title": "EU NIS2",
+      "edition": "Directive (EU) 2022/2555",
+      "scopeNote": "Determine sector, size, jurisdiction, national transposition and implementing rules. Proposed amendments are not treated as enacted obligations.",
+      "sources": ["https://digital-strategy.ec.europa.eu/en/policies/nis2-directive", "https://eur-lex.europa.eu/eli/dir/2022/2555/oj/eng"],
+      "questions": [
+        {"id": "nis2.q01", "prompt": "Have entity classification, jurisdiction and applicable national requirements been established?", "evidence": "Applicability analysis and national-law register.", "method": "examine"},
+        {"id": "nis2.q02", "prompt": "Are management oversight, approval and cybersecurity competence evidenced?", "evidence": "Management decisions and training records.", "method": "interview"},
+        {"id": "nis2.q03", "prompt": "Are risk analysis and information-system security policies maintained?", "evidence": "Risk assessments and approved security policies.", "method": "examine"},
+        {"id": "nis2.q04", "prompt": "Can incidents be handled and reported through the applicable authority channels?", "evidence": "Classification procedure and notification exercise.", "method": "test"},
+        {"id": "nis2.q05", "prompt": "Have continuity, backup, recovery and crisis procedures been exercised?", "evidence": "Continuity plans and exercise outcomes.", "method": "test"},
+        {"id": "nis2.q06", "prompt": "Are direct supplier and service-provider security risks assessed?", "evidence": "Supplier risk analysis and contractual requirements.", "method": "examine"},
+        {"id": "nis2.q07", "prompt": "Are secure acquisition, development and vulnerability handling operational?", "evidence": "Lifecycle controls and disclosure/remediation records.", "method": "test"},
+        {"id": "nis2.q08", "prompt": "Are control effectiveness and cyber-hygiene practices assessed?", "evidence": "Effectiveness evaluations and awareness evidence.", "method": "examine"},
+        {"id": "nis2.q09", "prompt": "Are cryptography, asset, personnel and access protections appropriate?", "evidence": "Safeguard decisions and access/configuration tests.", "method": "test"},
+        {"id": "nis2.q10", "prompt": "Are registration, reporting ownership and required records maintained for this jurisdiction?", "evidence": "Authority contacts, registrations and decision records.", "method": "examine"}
+      ]
+    },
+    {
+      "id": "dora",
+      "title": "EU DORA",
+      "edition": "Regulation (EU) 2022/2554",
+      "scopeNote": "Determine financial-entity scope and applicable technical standards with counsel. Keep national supervisory instructions and proportionality decisions current.",
+      "sources": ["https://www.eiopa.europa.eu/digital-operational-resilience-act-dora_en", "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng"],
+      "questions": [
+        {"id": "dora.q01", "prompt": "Are applicability, competent authority and proportionality decisions documented?", "evidence": "Entity-scope and supervisory-requirements analysis.", "method": "examine"},
+        {"id": "dora.q02", "prompt": "Does management oversee the ICT risk-management framework?", "evidence": "Governance approvals and accountability records.", "method": "interview"},
+        {"id": "dora.q03", "prompt": "Are ICT assets, dependencies and critical or important functions mapped?", "evidence": "Function mapping and dependency inventory.", "method": "examine"},
+        {"id": "dora.q04", "prompt": "Are protection, detection and recovery measures tested against ICT risks?", "evidence": "Technical testing and risk-treatment evidence.", "method": "test"},
+        {"id": "dora.q05", "prompt": "Can major ICT incidents be classified and reported using applicable requirements?", "evidence": "Incident classification and reporting exercise.", "method": "test"},
+        {"id": "dora.q06", "prompt": "Does resilience testing cover relevant systems and remediate identified weaknesses?", "evidence": "Testing program, results and remediation retests.", "method": "test"},
+        {"id": "dora.q07", "prompt": "Has applicability of advanced threat-led testing been assessed?", "evidence": "Scope determination and authorized testing plan.", "method": "examine"},
+        {"id": "dora.q08", "prompt": "Is the register of ICT third-party arrangements complete and maintained?", "evidence": "Register of information and reconciliation evidence.", "method": "examine"},
+        {"id": "dora.q09", "prompt": "Do ICT contracts, concentration assessments and exit plans address relevant dependencies?", "evidence": "Contract review, concentration analysis and exit tests.", "method": "examine"},
+        {"id": "dora.q10", "prompt": "Do lessons learned, continuity exercises and regulatory changes update the framework?", "evidence": "Exercise lessons and framework review decisions.", "method": "interview"}
+      ]
+    },
+    {
+      "id": "fedramp-rev5",
+      "title": "FedRAMP Rev5",
+      "edition": "Rev5 agency-authorization path; confirm current eligibility",
+      "scopeNote": "This is advisory preparation for the specifically selected Rev5 path, not FedRAMP Ready, an RAR, an authorization, or a 20x assessment.",
+      "sources": ["https://www.fedramp.gov/rev5/agency-authorization/", "https://fedramp.gov/legacy/"],
+      "questions": [
+        {"id": "fedramp-rev5.q01", "prompt": "Has the applicable authorization path and current submission eligibility been confirmed?", "evidence": "Agency/FedRAMP coordination and path decision.", "method": "examine"},
+        {"id": "fedramp-rev5.q02", "prompt": "Are cloud offering boundaries, impact level and service dependencies defined?", "evidence": "Boundary diagram and impact-level rationale.", "method": "examine"},
+        {"id": "fedramp-rev5.q03", "prompt": "Is agency sponsorship and assessor engagement appropriate to the selected path?", "evidence": "Agency coordination and recognized-assessor engagement.", "method": "interview"},
+        {"id": "fedramp-rev5.q04", "prompt": "Does the security plan describe selected controls and implementation responsibilities?", "evidence": "Security plan and responsibility matrix.", "method": "examine"},
+        {"id": "fedramp-rev5.q05", "prompt": "Are federal mandates and applicable technical requirements evidenced?", "evidence": "Requirement-specific configuration and validation evidence.", "method": "test"},
+        {"id": "fedramp-rev5.q06", "prompt": "Are inventories, vulnerability scans and remediation processes complete?", "evidence": "Inventory reconciliation, scans and remediation samples.", "method": "test"},
+        {"id": "fedramp-rev5.q07", "prompt": "Is the assessment plan agreed with authorized testing boundaries?", "evidence": "Assessment plan, permissions and sampling approach.", "method": "examine"},
+        {"id": "fedramp-rev5.q08", "prompt": "Are assessment findings and action milestones traceable to evidence?", "evidence": "Assessment workpapers and corrective-action register.", "method": "examine"},
+        {"id": "fedramp-rev5.q09", "prompt": "Are continuous monitoring, change reporting and incident coordination operational?", "evidence": "Monitoring submissions and coordination exercise.", "method": "test"},
+        {"id": "fedramp-rev5.q10", "prompt": "Have advisory gaps been separated from any formal readiness or authorization decision?", "evidence": "Independent assessor review and decision boundaries.", "method": "examine"}
+      ]
+    }
+  ]
+}

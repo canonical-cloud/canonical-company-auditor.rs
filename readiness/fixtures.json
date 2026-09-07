@@ -1,0 +1,65 @@
+[
+  {
+    "response": {
+      "schemaVersion": "canonical.readiness-response/v1", "catalogVersion": "2026-09-07.1", "frameworkId": "gdpr",
+      "context": {"customerId": "acme", "assessmentId": "readiness-2026-09", "scope": "Customer production billing service; US operations", "periodStart": "2026-08-01", "periodEnd": "2026-08-31", "asOf": "2026-09-07"},
+      "answers": []
+    },
+    "report": {
+      "schemaVersion": "canonical.readiness-report/v1", "catalogVersion": "2026-09-07.1", "frameworkId": "gdpr",
+      "context": {"customerId": "acme", "assessmentId": "readiness-2026-09", "scope": "Customer production billing service; US operations", "periodStart": "2026-08-01", "periodEnd": "2026-08-31", "asOf": "2026-09-07"},
+      "summary": {"total": 10, "answered": 0, "declaredGaps": 0, "unknownEvidence": 0, "incompleteMetadata": 0, "reviewPending": 0, "overdueActions": 0},
+      "items": [
+        {"questionId": "gdpr.q01", "status": "unanswered", "issues": ["unanswered"]},
+        {"questionId": "gdpr.q02", "status": "unanswered", "issues": ["unanswered"]},
+        {"questionId": "gdpr.q03", "status": "unanswered", "issues": ["unanswered"]},
+        {"questionId": "gdpr.q04", "status": "unanswered", "issues": ["unanswered"]},
+        {"questionId": "gdpr.q05", "status": "unanswered", "issues": ["unanswered"]},
+        {"questionId": "gdpr.q06", "status": "unanswered", "issues": ["unanswered"]},
+        {"questionId": "gdpr.q07", "status": "unanswered", "issues": ["unanswered"]},
+        {"questionId": "gdpr.q08", "status": "unanswered", "issues": ["unanswered"]},
+        {"questionId": "gdpr.q09", "status": "unanswered", "issues": ["unanswered"]},
+        {"questionId": "gdpr.q10", "status": "unanswered", "issues": ["unanswered"]}
+      ],
+      "declaredGapsOrUnknowns": true, "assurance": "none",
+      "notice": "Customer declarations and evidence references only. Evidence contents, operating effectiveness, applicability and reviewer identity have not been verified. This is not certification, attestation, authorization or a legal opinion."
+    }
+  },
+  {
+    "response": {
+      "schemaVersion": "canonical.readiness-response/v1", "catalogVersion": "2026-09-07.1", "frameworkId": "soc2",
+      "context": {"customerId": "acme", "assessmentId": "readiness-2026-09", "scope": "Customer production billing service; US operations", "periodStart": "2026-08-01", "periodEnd": "2026-08-31", "asOf": "2026-09-07"},
+      "answers": [
+        {"questionId": "soc2.q01", "status": "implemented", "owner": "Owner", "notes": "Evidence missing", "evidenceRef": "", "evidenceDate": "", "reviewer": "", "dueDate": ""},
+        {"questionId": "soc2.q02", "status": "implemented", "owner": "Owner", "notes": "Evidence reference only", "evidenceRef": "vault:e-01", "evidenceDate": "2026-08-31", "reviewer": "Reviewer", "dueDate": ""},
+        {"questionId": "soc2.q03", "status": "partial", "owner": "Owner", "notes": "Partial implementation", "evidenceRef": "", "evidenceDate": "", "reviewer": "", "dueDate": "2026-09-01"},
+        {"questionId": "soc2.q04", "status": "missing", "owner": "", "notes": "No owner or target", "evidenceRef": "", "evidenceDate": "", "reviewer": "", "dueDate": ""},
+        {"questionId": "soc2.q05", "status": "not_applicable", "owner": "Owner", "notes": "Applicability not reviewed", "evidenceRef": "", "evidenceDate": "", "reviewer": "", "dueDate": ""},
+        {"questionId": "soc2.q06", "status": "not_applicable", "owner": "Owner", "notes": "Documented scope rationale", "evidenceRef": "", "evidenceDate": "", "reviewer": "Reviewer", "dueDate": ""},
+        {"questionId": "soc2.q07", "status": "unanswered", "owner": "", "notes": "", "evidenceRef": "", "evidenceDate": "", "reviewer": "", "dueDate": ""},
+        {"questionId": "soc2.q08", "status": "unanswered", "owner": "", "notes": "", "evidenceRef": "", "evidenceDate": "", "reviewer": "", "dueDate": ""},
+        {"questionId": "soc2.q09", "status": "unanswered", "owner": "", "notes": "", "evidenceRef": "", "evidenceDate": "", "reviewer": "", "dueDate": ""},
+        {"questionId": "soc2.q10", "status": "unanswered", "owner": "", "notes": "", "evidenceRef": "", "evidenceDate": "", "reviewer": "", "dueDate": ""}
+      ]
+    },
+    "report": {
+      "schemaVersion": "canonical.readiness-report/v1", "catalogVersion": "2026-09-07.1", "frameworkId": "soc2",
+      "context": {"customerId": "acme", "assessmentId": "readiness-2026-09", "scope": "Customer production billing service; US operations", "periodStart": "2026-08-01", "periodEnd": "2026-08-31", "asOf": "2026-09-07"},
+      "summary": {"total": 10, "answered": 6, "declaredGaps": 2, "unknownEvidence": 1, "incompleteMetadata": 2, "reviewPending": 4, "overdueActions": 1},
+      "items": [
+        {"questionId": "soc2.q01", "status": "implemented", "issues": ["assessor_review_pending", "evidence_unknown"]},
+        {"questionId": "soc2.q02", "status": "implemented", "issues": []},
+        {"questionId": "soc2.q03", "status": "partial", "issues": ["assessor_review_pending", "declared_gap", "remediation_overdue"]},
+        {"questionId": "soc2.q04", "status": "missing", "issues": ["owner_or_explanation_missing", "assessor_review_pending", "declared_gap", "remediation_date_missing"]},
+        {"questionId": "soc2.q05", "status": "not_applicable", "issues": ["assessor_review_pending", "applicability_review_missing"]},
+        {"questionId": "soc2.q06", "status": "not_applicable", "issues": []},
+        {"questionId": "soc2.q07", "status": "unanswered", "issues": ["unanswered"]},
+        {"questionId": "soc2.q08", "status": "unanswered", "issues": ["unanswered"]},
+        {"questionId": "soc2.q09", "status": "unanswered", "issues": ["unanswered"]},
+        {"questionId": "soc2.q10", "status": "unanswered", "issues": ["unanswered"]}
+      ],
+      "declaredGapsOrUnknowns": true, "assurance": "none",
+      "notice": "Customer declarations and evidence references only. Evidence contents, operating effectiveness, applicability and reviewer identity have not been verified. This is not certification, attestation, authorization or a legal opinion."
+    }
+  }
+]

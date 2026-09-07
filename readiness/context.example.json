@@ -1,0 +1,8 @@
+{
+  "customerId": "acme",
+  "assessmentId": "readiness-2026-09",
+  "scope": "Customer production billing service; US operations",
+  "periodStart": "2026-08-01",
+  "periodEnd": "2026-08-31",
+  "asOf": "2026-09-07"
+}

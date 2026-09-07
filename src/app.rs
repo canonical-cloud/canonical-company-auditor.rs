@@ -25,6 +25,8 @@ use crate::program::{AssessmentProgram, built_in_program};
 use crate::report::{PromptKind, render_markdown, render_prompt};
 use crate::server::{ServeConfig, run};
 
+mod readiness;
+
 const MAX_INPUT_BYTES: u64 = 10 * 1024 * 1024;
 
 /// Process-level success or deterministic finding-threshold failure.
@@ -44,6 +46,7 @@ pub enum Exit {
 /// fails.
 pub async fn execute(cli: Cli) -> Result<Exit, AuditError> {
     match cli.command {
+        Command::Readiness(arguments) => readiness::execute(&arguments),
         Command::Catalog(arguments) => catalog(&arguments),
         Command::Validate(arguments) => validate(&arguments),
         Command::Assess(arguments) => assess_command(&arguments),

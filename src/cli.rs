@@ -16,6 +16,8 @@ pub struct Cli {
 /// Supported top-level operations.
 #[derive(Clone, Debug, Subcommand)]
 pub enum Command {
+    /// Export or assess an independently scoped customer readiness questionnaire.
+    Readiness(ReadinessArgs),
     /// Inspect reviewed framework metadata and deterministic rule coverage.
     Catalog(CatalogArgs),
     /// Validate manifest, evidence, and assessment program without writing a report.
@@ -193,4 +195,34 @@ pub enum ReportFormat {
     Json,
     /// Human-readable Markdown.
     Markdown,
+}
+
+/// Independent readiness packet settings; these never grant assurance.
+#[derive(Clone, Debug, Args)]
+pub struct ReadinessArgs {
+    /// Exact framework identifier from the readiness catalog.
+    #[arg(long, env = "CANONICAL_AUDITOR_READINESS_FRAMEWORK")]
+    pub framework: String,
+    /// Expected customer, assessment, scope and evidence-period JSON.
+    #[arg(long, env = "CANONICAL_AUDITOR_READINESS_CONTEXT")]
+    pub context: PathBuf,
+    /// Optional customer answers; omission creates an unanswered template.
+    #[arg(long, env = "CANONICAL_AUDITOR_READINESS_RESPONSES")]
+    pub responses: Option<PathBuf>,
+    /// New output path, or `-` for stdout. Existing files are refused.
+    #[arg(
+        long,
+        short,
+        default_value = "-",
+        env = "CANONICAL_AUDITOR_READINESS_OUTPUT"
+    )]
+    pub output: String,
+    /// JSON packet/report or human-readable Markdown checklist.
+    #[arg(
+        long,
+        value_enum,
+        default_value = "markdown",
+        env = "CANONICAL_AUDITOR_READINESS_FORMAT"
+    )]
+    pub format: ReportFormat,
 }
