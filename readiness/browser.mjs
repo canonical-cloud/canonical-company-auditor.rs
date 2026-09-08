@@ -46,7 +46,7 @@ function renderQuestions() {
       if (key === 'status') for (const status of STATUSES) { const option = document.createElement('option'); option.value = status; option.textContent = status.replaceAll('_', ' '); input.append(option); }
       else if (key.endsWith('Date')) { input.type = 'date'; input.min = '1900-01-01'; input.max = key === 'evidenceDate' ? context.asOf : '9999-12-31'; }
       else input.maxLength = key === 'notes' ? 4000 : 128;
-      if (key === 'evidenceRef') input.pattern = '[A-Za-z0-9][A-Za-z0-9._:-]{0,127}';
+      if (key === 'evidenceRef') input.pattern = String.raw`[A-Za-z0-9][A-Za-z0-9._:\-]{0,127}`;
       if (key === 'notes') { input.rows = 3; label.className = 'wide'; }
       input.value = answer[key];
       const printed = document.createElement('p'); printed.className = 'print-value'; printed.textContent = answer[key] || '________________';
