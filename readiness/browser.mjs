@@ -4,6 +4,19 @@ const fieldLabels = { status: 'Customer declaration', owner: 'Control or remedia
 const importExclusively = exclusiveOperation();
 let catalog, selected, context, draft, dirty = false, importing = false, lastReport;
 function error(message, focus = false) { $('error').textContent = message; if (message && focus) $('error').focus(); }
+async function readFileBytes(file) {
+  let deadline;
+  try {
+    return await Promise.race([
+      Promise.resolve().then(() => file.arrayBuffer()).catch(() => {
+        throw new Error('Unable to read draft file; current answers are unchanged.');
+      }),
+      new Promise((_, reject) => {
+        deadline = setTimeout(() => reject(new Error('Draft file read timed out; current answers are unchanged.')), 5000);
+      }),
+    ]);
+  } finally { clearTimeout(deadline); }
+}
 function fieldsValid() {
   for (const input of $('questions').querySelectorAll('input,textarea,select')) {
     if (!input.validity.valid) throw new Error('Complete or correct the highlighted field before exporting.');
@@ -98,8 +111,7 @@ $('import').addEventListener('change', async (event) => {
     setImporting(true);
     try {
       if (file.size > MAX_BYTES) throw new Error('Response exceeds the 1 MiB limit');
-      let bytes;
-      try { bytes = await file.arrayBuffer(); } catch { throw new Error('Unable to read draft file; current answers are unchanged.'); }
+      const bytes = await readFileBytes(file);
       const incoming = importDraft(catalog, selected.id, context, new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes));
       if (dirty && hasAnswerEdits(draft) && !window.confirm('Replace this tab’s unsaved answers with the matching imported draft?')) return;
       draft = incoming; dirty = true; renderQuestions();
