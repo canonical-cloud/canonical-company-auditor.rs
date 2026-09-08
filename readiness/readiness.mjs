@@ -142,3 +142,76 @@ export function markdown(catalog, id, context, draft) {
   lines.push('## Authoritative references', '', ...selected.sources.map((url) => `- ${url}`), '');
   return lines.join('\n');
 }
+
+// A draft can contain valuable evidence/ownership work before its status changes.
+export function hasAnswerEdits(draft) {
+  return draft.answers.some((answer) => ANSWER_KEYS.some((key) =>
+    key !== 'questionId' && answer[key] !== (key === 'status' ? 'unanswered' : '')));
+}
+
+// Only one file read/replacement may be active. Failed or cancelled operations
+// release the gate; ignored overlapping calls cannot reset an active operation.
+export function exclusiveOperation() {
+  let active = false;
+  return async (operation) => {
+    if (active) return false;
+    active = true;
+    try { await operation(); return true; }
+    finally { active = false; }
+  };
+}
+
+export const QUESTION_VIEWS = Object.freeze(['all', 'unanswered', 'gaps', 'evidence', 'review', 'overdue']);
+export function visibleQuestionIds(report, view) {
+  if (!QUESTION_VIEWS.includes(view)) throw new Error('Unknown question view');
+  const issue = { unanswered: 'unanswered', gaps: 'declared_gap', evidence: 'evidence_unknown', review: 'assessor_review_pending', overdue: 'remediation_overdue' }[view];
+  return new Set(report.items.filter((item) => view === 'all' || item.issues.includes(issue)).map((item) => item.questionId));
+}
+
+// Planning template only: no customer declaration becomes an assessor result.
+// The existing response contract remains the authoritative input boundary.
+export function workpaper(catalog, id, context, draft) {
+  const report = analyze(catalog, id, context, draft), selected = framework(catalog, id);
+  const answers = new Map(draft.answers.map((answer) => [answer.questionId, answer]));
+  const lines = [`# ${markdownText(selected.title)} pre-audit workpaper`, '',
+    `Edition: ${markdownText(selected.edition)}. Catalog: ${markdownText(catalog.version)}.`, '',
+    'Planning template; no assessment has been performed by this export. All assessor outcomes start as not assessed. Customer declarations, N/A decisions and reviewer names are not inherited as assurance.', '',
+    report.notice, '', markdownText(selected.scopeNote), ''];
+  for (const key of CONTEXT_KEYS) lines.push(`${key}: ${markdownText(context[key])}`, '');
+  lines.push('## Engagement authorization and coverage', '',
+    'Lead assessor / competence / independence: ____________________', '',
+    'Applicable licensed/public requirement program and edition: ____________________', '',
+    'Scope exclusions and approved applicability rationale: ____________________', '',
+    'Written test authorization, allowed targets/operations, window and stop contact: ____________________', '',
+    'Evidence repository access, minimization, retention and deletion agreement: ____________________', '',
+    'These broad intake prompts must be expanded against the applicable full requirement program. Choose depth, coverage and sampling for this engagement; no universal sample count is implied.', '');
+  for (const question of selected.questions) {
+    const answer = answers.get(question.id);
+    lines.push(`## Workpaper ${markdownText(question.id)}`, '',
+      `Intake objective: ${markdownText(question.prompt)}`, '',
+      `Customer declaration (unverified): ${markdownText(answer?.status ?? 'unanswered')}`, '',
+      `Customer owner (unverified): ${markdownText(answer?.owner ?? '')}`, '',
+      `Evidence request: ${markdownText(question.evidence)}`, '',
+      `Existing opaque reference (unverified): ${markdownText(answer?.evidenceRef ?? '')}`, '',
+      `Suggested primary method: ${markdownText(question.method)}; assessor confirms examine / interview / test and complementary methods.`, '',
+      'Requirement reference / applicability / testable determination: ____________________', '',
+      'Evidence-request owner / due date / observation period: ____________________', '',
+      'Population definition / source query / size / completeness reconciliation: ____________________', '',
+      'Selection method / risk strata / sample-size rationale / selected opaque item IDs: ____________________', '',
+      'Zero-event population, substitutions and limitations: ____________________', '',
+      'Authorized test steps / expected behavior / actual observation: ____________________', '',
+      'Evidence IDs / collector / collected-at / tool version / integrity digest / redactions: ____________________', '',
+      'Design evaluation / operating-period evidence / contradictions: ____________________', '',
+      'Assessor outcome: not assessed', '',
+      'Finding ID / risk / remediation owner / target date / retest criteria: ____________________', '',
+      'Retest evidence and residual limitations: ____________________', '',
+      'Independent review: pending; authenticated approval reference: ____________________', '');
+  }
+  lines.push('## Handoff', '',
+    'Unresolved requests / exclusions / residual uncertainty: ____________________', '',
+    'Qualified assessor recommendation and approval reference: ____________________', '',
+    'Store completed workpapers in approved protected storage. Do not paste credentials, PHI or raw personal records. Completing this template is not certification or a legal opinion.', '',
+    '## Methodology reference', '',
+    'NIST assessment planning guidance (adapt to the selected framework; not a cross-framework control mapping): https://csrc.nist.gov/pubs/sp/800/53/a/r5/final', '');
+  return lines.join('\n');
+}
