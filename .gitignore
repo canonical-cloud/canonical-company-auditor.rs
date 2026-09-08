@@ -11,6 +11,8 @@ node_modules/
 __pycache__/
 *.pyc
 
-# Local temporary directories and Git worktrees (DEN-3956).
+# Local temporary directories and authorized Git worktrees (DEN-3956).
 tmp/
 temp/
+tmp/worktrees/
+temp/worktrees/
