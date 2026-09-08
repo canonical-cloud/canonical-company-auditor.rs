@@ -201,3 +201,39 @@ aliases = ["max-body-bytes"]
 type = "int"
 default = 1048576
 help = "Maximum JSON request body size."
+
+[commands.readiness]
+help = "Export or assess one independently scoped readiness questionnaire; no assurance."
+
+[commands.readiness.flags.framework]
+env = "CANONICAL_AUDITOR_READINESS_FRAMEWORK"
+aliases = ["framework"]
+type = "string"
+help = "Exact framework identifier from readiness/catalog.json."
+
+[commands.readiness.flags.context]
+env = "CANONICAL_AUDITOR_READINESS_CONTEXT"
+aliases = ["context"]
+type = "string"
+help = "Expected customer, assessment, scope and evidence-period JSON."
+
+[commands.readiness.flags.responses]
+env = "CANONICAL_AUDITOR_READINESS_RESPONSES"
+aliases = ["responses"]
+type = "string"
+help = "Optional customer-response JSON; omission produces an unanswered template."
+
+[commands.readiness.flags.output]
+env = "CANONICAL_AUDITOR_READINESS_OUTPUT"
+aliases = ["output"]
+short = "o"
+type = "string"
+default = "-"
+help = "New output path, or '-' for stdout; existing files are refused."
+
+[commands.readiness.flags.format]
+env = "CANONICAL_AUDITOR_READINESS_FORMAT"
+aliases = ["format"]
+type = "string"
+default = "markdown"
+help = "Output format: markdown or json."
