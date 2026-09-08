@@ -1,8 +1,8 @@
 //! Command orchestration and bounded file/stdout boundaries.
 
 use std::fmt::Write as _;
-use std::fs::{File, OpenOptions, create_dir};
-use std::io::{BufWriter, Read, Write};
+use std::fs::File;
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
@@ -25,7 +25,10 @@ use crate::program::{AssessmentProgram, built_in_program};
 use crate::report::{PromptKind, render_markdown, render_prompt};
 use crate::server::{ServeConfig, run};
 
+mod output;
 mod readiness;
+
+use output::{create_private_dir, write_new_file, write_output};
 
 const MAX_INPUT_BYTES: u64 = 10 * 1024 * 1024;
 
@@ -146,7 +149,7 @@ fn package(arguments: &PackageArgs) -> Result<Exit, AuditError> {
     let dossier = read_json::<AuditDossier>(&arguments.dossier)?;
     let package = build_audit_package(&dossier)?;
     let manifest = format!("{}\n", serde_json::to_string_pretty(&package.manifest)?);
-    create_dir(&arguments.output_dir)?;
+    create_private_dir(&arguments.output_dir)?;
     for document in &package.documents {
         write_new_file(
             &arguments.output_dir.join(&document.file_name),
@@ -211,31 +214,6 @@ fn read_bounded(path: &Path) -> Result<Vec<u8>, AuditError> {
         });
     }
     Ok(bytes)
-}
-
-fn write_output(path: &str, contents: &str) -> Result<(), AuditError> {
-    if path == "-" {
-        let stdout = std::io::stdout();
-        let mut writer = BufWriter::new(stdout.lock());
-        writer.write_all(contents.as_bytes())?;
-        writer.flush()?;
-        return Ok(());
-    }
-    let file = OpenOptions::new().create_new(true).write(true).open(path)?;
-    let mut writer = BufWriter::new(file);
-    writer.write_all(contents.as_bytes())?;
-    writer.flush()?;
-    writer.get_ref().sync_all()?;
-    Ok(())
-}
-
-fn write_new_file(path: &Path, contents: &[u8]) -> Result<(), AuditError> {
-    let file = OpenOptions::new().create_new(true).write(true).open(path)?;
-    let mut writer = BufWriter::new(file);
-    writer.write_all(contents)?;
-    writer.flush()?;
-    writer.get_ref().sync_all()?;
-    Ok(())
 }
 
 fn parse_threshold(value: &str) -> Result<Option<Severity>, AuditError> {

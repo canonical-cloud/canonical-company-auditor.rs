@@ -13,24 +13,25 @@
   <aside class="notice"><strong>Readiness is not certification.</strong> These original prompts are not exhaustive normative requirements. An assessor must review applicability and actual evidence. Do not enter secrets, PHI, personal records or raw evidence. Use opaque evidence references.</aside>
   <nav aria-label="Readiness frameworks" id="frameworks"></nav>
   <section aria-labelledby="selected-title"><h2 id="selected-title">Choose a framework</h2><p id="edition"></p><p id="scope-note"></p></section>
-  <p class="notice">Answers stay in this tab's memory. Nothing is uploaded or saved to your account or browser storage. Export your JSON draft before leaving. Each framework must be completed independently; imports from another framework or assessment are rejected.</p>
+  <p class="notice">Answers stay in this tab's memory. Nothing is uploaded or saved to your account or browser storage. Export your JSON draft before leaving and verify the file was saved. Exports are unencrypted: use approved protected storage. Each framework must be completed independently; imports from another framework or assessment are rejected.</p>
   <form id="context" autocomplete="off" hidden>
     <h2>Define this assessment</h2>
     <div class="grid">
       <label>Customer identifier <input name="customerId" required maxlength="128" placeholder="acme"></label>
       <label>Assessment identifier <input name="assessmentId" required maxlength="128" placeholder="readiness-2026-09"></label>
       <label class="wide">System and organizational scope <textarea name="scope" required maxlength="1000" rows="2"></textarea></label>
-      <label>Evidence period start <input name="periodStart" type="date" required></label>
-      <label>Evidence period end <input name="periodEnd" type="date" required></label>
-      <label>As-of date <input name="asOf" type="date" required></label>
+      <label>Evidence period start <input name="periodStart" type="date" min="1900-01-01" max="9999-12-31" required></label>
+      <label>Evidence period end <input name="periodEnd" type="date" min="1900-01-01" max="9999-12-31" required></label>
+      <label>As-of date <input name="asOf" type="date" min="1900-01-01" max="9999-12-31" required></label>
     </div>
     <p>Identifiers are assessment labels, not access-control credentials. Use the period covered by available evidence, not a future audit deadline.</p>
     <button type="submit" id="start">Start an independent checklist</button>
   </form>
   <p id="error" role="alert" tabindex="-1"></p>
   <section id="workspace" hidden>
-    <div class="toolbar"><button id="export-json" type="button">Export JSON draft</button><button id="export-md" type="button">Export Markdown</button><label class="file-label">Import matching draft <input id="import" type="file" accept=".json,application/json"></label><button id="print" type="button">Print checklist</button></div>
+    <div class="toolbar"><button id="export-json" type="button">Export JSON draft</button><button id="export-md" type="button">Export Markdown</button><button id="export-workpaper" type="button">Export assessor workpaper</button><label class="file-label">Import matching draft <input id="import" type="file" accept=".json,application/json"></label><button id="print" type="button">Print checklist</button></div>
     <p id="summary" role="status" aria-live="polite"></p>
+    <div class="toolbar"><label>Show questions <select id="question-view"><option value="all">All questions</option><option value="unanswered">Unanswered</option><option value="gaps">Declared gaps</option><option value="evidence">Unknown evidence</option><option value="review">Review pending</option><option value="overdue">Overdue actions</option></select></label><p id="visible-count" role="status" aria-live="polite"></p></div>
     <div id="questions"></div>
   </section>
   <section id="references" aria-label="Authoritative references"></section>

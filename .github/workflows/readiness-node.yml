@@ -20,4 +20,4 @@ jobs:
       - name: Probe boundary regression tests
         run: node --test probes/typescript/runtime-probe.test.mjs
       - name: Independent readiness contract regression tests
-        run: node --test readiness/readiness.test.mjs
+        run: node --test readiness/*.test.mjs
