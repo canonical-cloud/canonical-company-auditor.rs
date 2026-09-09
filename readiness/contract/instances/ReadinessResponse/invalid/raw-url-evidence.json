@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "canonical.readiness-response/v1",
+  "catalogVersion": "2026-09-07.1",
+  "frameworkId": "gdpr",
+  "context": {
+    "customerId": "acme",
+    "assessmentId": "privacy-2026-09",
+    "scope": "Customer privacy operations",
+    "periodStart": "2026-08-01",
+    "periodEnd": "2026-08-31",
+    "asOf": "2026-09-08"
+  },
+  "answers": [{
+    "questionId": "gdpr.q01",
+    "status": "partial",
+    "owner": "Privacy",
+    "notes": "Invalid fixture",
+    "evidenceRef": "https://example.invalid/private?token=not-a-real-token",
+    "evidenceDate": "2026-08-31",
+    "reviewer": "",
+    "dueDate": "2026-10-01"
+  }]
+}

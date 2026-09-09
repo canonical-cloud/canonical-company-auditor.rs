@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "canonical.readiness-response/v1",
+  "catalogVersion": "2026-09-07.1",
+  "frameworkId": "soc2",
+  "context": {
+    "customerId": "acme",
+    "assessmentId": "readiness-2026-09",
+    "scope": "Production billing service",
+    "periodStart": "2026-08-01",
+    "periodEnd": "2026-08-31",
+    "asOf": "2026-09-08"
+  },
+  "answers": [{
+    "questionId": "soc2.q01",
+    "status": "ready",
+    "owner": "Security",
+    "notes": "Invalid fixture",
+    "evidenceRef": "",
+    "evidenceDate": "",
+    "reviewer": "",
+    "dueDate": ""
+  }]
+}
