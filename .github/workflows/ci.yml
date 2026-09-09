@@ -42,7 +42,7 @@ jobs:
         with:
           node-version: "22.23.2"
       - name: Compare independent TypeSpec and JSON Schema authorities
-        uses: ORESoftware/typespec-json-schema-validator@2281843126ab644607b11cf8281d84f382d68dfc
+        uses: ORESoftware/typespec-json-schema-validator@ac946cb7b7d1f3a59171f3663f5fcdfa543fb31d
         with:
           typespec: readiness/contract/main.tsp
           schema: readiness/response.schema.json
@@ -78,7 +78,7 @@ jobs:
           }, indent=2, sort_keys=True))
           PY
       - name: Verify exact Contract IR before consumer admission
-        uses: ORESoftware/typespec-json-schema-validator/actions/verify-contract-ir@2281843126ab644607b11cf8281d84f382d68dfc
+        uses: ORESoftware/typespec-json-schema-validator/actions/verify-contract-ir@ac946cb7b7d1f3a59171f3663f5fcdfa543fb31d
         with:
           contract_ir: .typespec-json-schema-validator/readiness-contract-ir.json
           report: .typespec-json-schema-validator/readiness-report.json
@@ -88,7 +88,7 @@ jobs:
           expected_declarations: '["CanonicalReadiness.DateString","CanonicalReadiness.FrameworkId","CanonicalReadiness.Identifier","CanonicalReadiness.ReadinessAnswer","CanonicalReadiness.ReadinessContext","CanonicalReadiness.ReadinessResponse","CanonicalReadiness.ReadinessStatus"]'
           verification: .typespec-json-schema-validator/readiness-consumer-verification.json
       - name: Prove altered evidence and incomplete scopes fail closed
-        uses: ORESoftware/typespec-json-schema-validator/actions/test-consumer-admission@2281843126ab644607b11cf8281d84f382d68dfc
+        uses: ORESoftware/typespec-json-schema-validator/actions/test-consumer-admission@ac946cb7b7d1f3a59171f3663f5fcdfa543fb31d
         with:
           contract_ir: .typespec-json-schema-validator/readiness-contract-ir.json
           report: .typespec-json-schema-validator/readiness-report.json
