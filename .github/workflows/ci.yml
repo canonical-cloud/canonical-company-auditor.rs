@@ -52,6 +52,31 @@ jobs:
           instances: readiness/contract/instances
           max_probes: "128"
           quiet: "false"
+      - name: Show public union witness when peer parity stops
+        if: failure()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('.typespec-json-schema-validator/generated/typespec.generated.schema.json')
+          if not path.is_file():
+              print('comparison witness was not produced')
+              raise SystemExit(0)
+          schema = json.loads(path.read_text(encoding='utf-8'))
+          answer = schema.get('$defs', {}).get('ReadinessAnswer', {})
+          response = schema.get('$defs', {}).get('ReadinessResponse', {})
+          print(json.dumps({
+              'ReadinessAnswer': {
+                  key: answer.get('properties', {}).get(key)
+                  for key in ('evidenceRef', 'evidenceDate', 'dueDate')
+              },
+              'ReadinessResponse': {
+                  key: response.get('properties', {}).get(key)
+                  for key in ('schemaVersion', 'catalogVersion')
+              },
+          }, indent=2, sort_keys=True))
+          PY
       - name: Verify exact Contract IR before consumer admission
         uses: ORESoftware/typespec-json-schema-validator/actions/verify-contract-ir@2281843126ab644607b11cf8281d84f382d68dfc
         with:
