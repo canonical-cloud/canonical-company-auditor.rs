@@ -23,10 +23,80 @@ jobs:
           persist-credentials: false
       - name: Verify repository policy
         run: python3 scripts/check-repository-policy.py
+      - name: Verify readiness peer-authority policy
+        run: python3 scripts/check-readiness-contract.py
       - name: Validate GitHub Actions syntax
         uses: docker://rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
         with:
           args: .github/workflows/ci.yml
+
+  contracts:
+    needs: policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22.23.2"
+      - name: Compare independent TypeSpec and JSON Schema authorities
+        uses: ORESoftware/typespec-json-schema-validator@2281843126ab644607b11cf8281d84f382d68dfc
+        with:
+          typespec: readiness/contract/main.tsp
+          schema: readiness/response.schema.json
+          report: .typespec-json-schema-validator/readiness-report.json
+          contract_ir: .typespec-json-schema-validator/readiness-contract-ir.json
+          output_dir: .typespec-json-schema-validator/generated
+          instances: readiness/contract/instances
+          max_probes: "128"
+          quiet: "false"
+      - name: Show public union witness when peer parity stops
+        if: failure()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('.typespec-json-schema-validator/generated/typespec.generated.schema.json')
+          if not path.is_file():
+              print('comparison witness was not produced')
+              raise SystemExit(0)
+          schema = json.loads(path.read_text(encoding='utf-8'))
+          answer = schema.get('$defs', {}).get('ReadinessAnswer', {})
+          response = schema.get('$defs', {}).get('ReadinessResponse', {})
+          print(json.dumps({
+              'ReadinessAnswer': {
+                  key: answer.get('properties', {}).get(key)
+                  for key in ('evidenceRef', 'evidenceDate', 'dueDate')
+              },
+              'ReadinessResponse': {
+                  key: response.get('properties', {}).get(key)
+                  for key in ('schemaVersion', 'catalogVersion')
+              },
+          }, indent=2, sort_keys=True))
+          PY
+      - name: Verify exact Contract IR before consumer admission
+        uses: ORESoftware/typespec-json-schema-validator/actions/verify-contract-ir@2281843126ab644607b11cf8281d84f382d68dfc
+        with:
+          contract_ir: .typespec-json-schema-validator/readiness-contract-ir.json
+          report: .typespec-json-schema-validator/readiness-report.json
+          typespec: readiness/contract/main.tsp
+          schema: readiness/response.schema.json
+          generated_schema: .typespec-json-schema-validator/generated/typespec.generated.schema.json
+          expected_declarations: '["CanonicalReadiness.DateString","CanonicalReadiness.FrameworkId","CanonicalReadiness.Identifier","CanonicalReadiness.ReadinessAnswer","CanonicalReadiness.ReadinessContext","CanonicalReadiness.ReadinessResponse","CanonicalReadiness.ReadinessStatus"]'
+          verification: .typespec-json-schema-validator/readiness-consumer-verification.json
+      - name: Prove altered evidence and incomplete scopes fail closed
+        uses: ORESoftware/typespec-json-schema-validator/actions/test-consumer-admission@2281843126ab644607b11cf8281d84f382d68dfc
+        with:
+          contract_ir: .typespec-json-schema-validator/readiness-contract-ir.json
+          report: .typespec-json-schema-validator/readiness-report.json
+          typespec: readiness/contract/main.tsp
+          schema: readiness/response.schema.json
+          generated_schema: .typespec-json-schema-validator/generated/typespec.generated.schema.json
+          expected_declarations: '["CanonicalReadiness.DateString","CanonicalReadiness.FrameworkId","CanonicalReadiness.Identifier","CanonicalReadiness.ReadinessAnswer","CanonicalReadiness.ReadinessContext","CanonicalReadiness.ReadinessResponse","CanonicalReadiness.ReadinessStatus"]'
+          verification: .typespec-json-schema-validator/readiness-regression-verification.json
 
   test:
     needs: policy
