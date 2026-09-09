@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-TJSV_SHA = "2281843126ab644607b11cf8281d84f382d68dfc"
+TJSV_SHA = "ac946cb7b7d1f3a59171f3663f5fcdfa543fb31d"
 EXPECTED_DEFS = {
     "DateString",
     "FrameworkId",
