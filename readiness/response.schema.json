@@ -56,10 +56,10 @@
         "status": {"$ref": "ReadinessStatus"},
         "owner": {"type": "string", "maxLength": 128, "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F]*$"},
         "notes": {"type": "string", "maxLength": 4000, "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F]*$"},
-        "evidenceRef": {"anyOf": [{"const": ""}, {"$ref": "Identifier"}]},
-        "evidenceDate": {"anyOf": [{"const": ""}, {"$ref": "DateString"}]},
+        "evidenceRef": {"anyOf": [{"const": ""}, {"type": "string", "$ref": "Identifier"}]},
+        "evidenceDate": {"anyOf": [{"const": ""}, {"type": "string", "$ref": "DateString"}]},
         "reviewer": {"type": "string", "maxLength": 128, "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F]*$"},
-        "dueDate": {"anyOf": [{"const": ""}, {"$ref": "DateString"}]}
+        "dueDate": {"anyOf": [{"const": ""}, {"type": "string", "$ref": "DateString"}]}
       }
     },
     "ReadinessResponse": {
@@ -69,8 +69,8 @@
       "unevaluatedProperties": false,
       "required": ["schemaVersion", "catalogVersion", "frameworkId", "context", "answers"],
       "properties": {
-        "schemaVersion": {"const": "canonical.readiness-response/v1"},
-        "catalogVersion": {"const": "2026-09-07.1"},
+        "schemaVersion": {"type": "string", "const": "canonical.readiness-response/v1"},
+        "catalogVersion": {"type": "string", "const": "2026-09-07.1"},
         "frameworkId": {"$ref": "FrameworkId"},
         "context": {"$ref": "ReadinessContext"},
         "answers": {"type": "array", "maxItems": 256, "items": {"$ref": "ReadinessAnswer"}}
