@@ -56,10 +56,10 @@
         "status": {"$ref": "ReadinessStatus"},
         "owner": {"type": "string", "maxLength": 128, "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F]*$"},
         "notes": {"type": "string", "maxLength": 4000, "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F]*$"},
-        "evidenceRef": {"anyOf": [{"const": ""}, {"type": "string", "$ref": "Identifier"}]},
-        "evidenceDate": {"anyOf": [{"const": ""}, {"type": "string", "$ref": "DateString"}]},
+        "evidenceRef": {"anyOf": [{"type": "string", "const": ""}, {"$ref": "Identifier"}]},
+        "evidenceDate": {"anyOf": [{"type": "string", "const": ""}, {"$ref": "DateString"}]},
         "reviewer": {"type": "string", "maxLength": 128, "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F]*$"},
-        "dueDate": {"anyOf": [{"const": ""}, {"type": "string", "$ref": "DateString"}]}
+        "dueDate": {"anyOf": [{"type": "string", "const": ""}, {"$ref": "DateString"}]}
       }
     },
     "ReadinessResponse": {
