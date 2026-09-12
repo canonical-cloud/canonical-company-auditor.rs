@@ -13,6 +13,7 @@ name = "canonical-auditor"
 path = "src/main.rs"
 
 [dependencies]
+next-loggers = { git = "https://github.com/ores-otel/ores.otel.log", rev = "a5ec8812df692ccc3bdcaaf89d984c44714970d5", package = "oresoftware-next-loggers" }
 axum = { version = "0.8.4", features = ["http1", "json", "tokio"] }
 clap = { version = "4.5.54", features = ["derive", "env"] }
 flags2env = { git = "https://github.com/ORESoftware/flags-2-env.git", rev = "4eb9360d418ed64de994e4b1d6e43e7063219e02" }
