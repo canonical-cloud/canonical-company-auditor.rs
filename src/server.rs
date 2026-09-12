@@ -99,7 +99,9 @@ pub async fn run(config: ServeConfig) -> Result<(), AuditError> {
     {
         let kind = error.kind();
         let _ = log
-            .error(vec![json!("assessment service stopped with an I/O failure")])
+            .error(vec![json!(
+                "assessment service stopped with an I/O failure"
+            )])
             .add_fields(JsonObject::from_iter([(
                 "error.kind".to_owned(),
                 json!(format!("{kind:?}")),
