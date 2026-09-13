@@ -11,6 +11,7 @@ use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use hmac::{Hmac, Mac};
+use next_loggers::{JsonObject, LogLevel, LogRecord, Logger, LoggerError, Options, Transport};
 use serde::Serialize;
 use serde_json::json;
 use sha2::Sha256;
@@ -42,6 +43,7 @@ pub struct ServeConfig {
 struct AppState {
     program: Arc<AssessmentProgram>,
     webhook_secret: Option<Arc<[u8]>>,
+    log: Logger,
 }
 
 #[derive(Serialize)]
@@ -57,6 +59,7 @@ struct ApiError {
 /// Returns an [`AuditError`] when configuration violates service policy, the built-in program is
 /// invalid, the listener cannot bind, or the server exits with an I/O failure.
 pub async fn run(config: ServeConfig) -> Result<(), AuditError> {
+    const ROUTINE_ID: &str = "ores-routine-mQLaojZeQEorlkkzJRhhv";
     if !(MIN_BODY_BYTES..=MAX_BODY_BYTES).contains(&config.max_body_bytes) {
         return Err(AuditError::ServerPolicy(format!(
             "max body bytes must be between {MIN_BODY_BYTES} and {MAX_BODY_BYTES}"
@@ -72,17 +75,78 @@ pub async fn run(config: ServeConfig) -> Result<(), AuditError> {
         ));
     }
 
+    let log = service_logger();
     let state = AppState {
         program: Arc::new(built_in_program()?),
         webhook_secret: webhook_secret.map(Arc::from),
+        log: log.clone(),
     };
     let app = router(state, config.max_body_bytes);
     let listener = tokio::net::TcpListener::bind(address).await?;
     tracing::info!(bind = %address, signed = webhook_secret_is_set(), "assessment service listening");
-    axum::serve(listener, app)
-        .with_graceful_shutdown(shutdown_signal())
-        .await?;
+    let _ = log
+        .info(vec![json!("assessment service listening")])
+        .add_fields(JsonObject::from_iter([(
+            "signed".to_owned(),
+            json!(webhook_secret_is_set()),
+        )]))
+        .add_trace("ores-trace-XmjuZYXVUmIeH4B0qMhdK", false)
+        .add_routine_id(ROUTINE_ID)
+        .send();
+    if let Err(error) = axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal(log.clone()))
+        .await
+    {
+        let kind = error.kind();
+        let _ = log
+            .error(vec![json!(
+                "assessment service stopped with an I/O failure"
+            )])
+            .add_fields(JsonObject::from_iter([(
+                "error.kind".to_owned(),
+                json!(format!("{kind:?}")),
+            )]))
+            .add_trace("ores-trace-4LJvMT84sMLW0-M6piMFe", false)
+            .add_routine_id(ROUTINE_ID)
+            .send();
+        return Err(error.into());
+    }
     Ok(())
+}
+
+/// Ores logger bridged into the stderr tracing subscriber; console output stays
+/// disabled because stdout is reserved for requested output.
+fn service_logger() -> Logger {
+    Logger::new(Options {
+        app_name: "canonical-company-auditor".to_owned(),
+        name: Some("server".to_owned()),
+        console: false,
+        transports: vec![Arc::new(TracingBridgeTransport)],
+        ..Options::default()
+    })
+}
+
+/// Bridges Ores structured records into the existing tracing pipeline.
+struct TracingBridgeTransport;
+
+impl Transport for TracingBridgeTransport {
+    fn write(&self, record: &LogRecord) -> Result<(), LoggerError> {
+        let encoded = record.to_json()?;
+        match record.level {
+            LogLevel::Trace => tracing::trace!(ores.record = %encoded, "Ores structured log"),
+            LogLevel::Debug => tracing::debug!(ores.record = %encoded, "Ores structured log"),
+            LogLevel::Info => tracing::info!(ores.record = %encoded, "Ores structured log"),
+            LogLevel::Warn => tracing::warn!(ores.record = %encoded, "Ores structured log"),
+            LogLevel::Error | LogLevel::Fatal => {
+                tracing::error!(ores.record = %encoded, "Ores structured log");
+            }
+        }
+        Ok(())
+    }
+
+    fn is_open_telemetry(&self) -> bool {
+        true
+    }
 }
 
 fn router(state: AppState, max_body_bytes: usize) -> Router {
@@ -198,6 +262,7 @@ fn authenticate(
     headers: &HeaderMap,
     body: &[u8],
 ) -> Result<(), (&'static str, &'static str)> {
+    const ROUTINE_ID: &str = "ores-routine-QybiV2sTorOG7v61GOIOw";
     let Some(secret) = &state.webhook_secret else {
         return Ok(());
     };
@@ -205,13 +270,35 @@ fn authenticate(
         .get(SIGNATURE_HEADER)
         .and_then(|value| value.to_str().ok())
     else {
+        // Outcome only: never the header, body, or secret.
+        let _ = state
+            .log
+            .warn(vec![json!("signed request rejected")])
+            .add_fields(rejection_fields("signature_required"))
+            .add_trace("ores-trace-Drkdi5N6nfsmsxcAcN765", false)
+            .add_routine_id(ROUTINE_ID)
+            .send();
         return Err(("signature_required", "signed request required"));
     };
     if verify_signature(secret, body, signature) {
         Ok(())
     } else {
+        let _ = state
+            .log
+            .warn(vec![json!("signed request rejected")])
+            .add_fields(rejection_fields("invalid_signature"))
+            .add_trace("ores-trace-J1wdPbKjGY3uMBfqV-_fk", false)
+            .add_routine_id(ROUTINE_ID)
+            .send();
         Err(("invalid_signature", "request signature did not verify"))
     }
+}
+
+fn rejection_fields(code: &'static str) -> JsonObject {
+    JsonObject::from_iter([
+        ("auth.outcome".to_owned(), json!("rejected")),
+        ("auth.code".to_owned(), json!(code)),
+    ])
 }
 
 fn verify_signature(secret: &[u8], body: &[u8], signature: &str) -> bool {
@@ -264,9 +351,15 @@ impl JsonResponse {
     }
 }
 
-async fn shutdown_signal() {
+async fn shutdown_signal(log: Logger) {
+    const ROUTINE_ID: &str = "ores-routine-rAECXfyjjXe2tSoSN5ErF";
     if let Err(error) = tokio::signal::ctrl_c().await {
         tracing::warn!(%error, "could not install Ctrl-C handler");
+        let _ = log
+            .warn(vec![json!("could not install Ctrl-C handler")])
+            .add_trace("ores-trace-HFMdadPbbpOGBd7muJKVz", false)
+            .add_routine_id(ROUTINE_ID)
+            .send();
     }
 }
 
