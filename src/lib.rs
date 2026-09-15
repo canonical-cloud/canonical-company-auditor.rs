@@ -9,6 +9,7 @@ pub mod cli;
 pub mod engagement;
 pub mod engine;
 pub mod evidence;
+pub mod evidence_merge;
 pub mod external_evidence;
 pub mod flags;
 pub mod model;
