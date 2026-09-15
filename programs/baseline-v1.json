@@ -33,11 +33,11 @@
     {
       "id": "iso-iec-27001-2022",
       "title": "ISO/IEC 27001 Information Security Management Systems",
-      "version": "2022",
+      "version": "2022 + Amd 1:2024",
       "authority": "ISO and IEC",
-      "sourceUrl": "https://www.iso.org/standard/82875.html",
+      "sourceUrl": "https://www.iso.org/standard/27001",
       "redistribution": "reference-only; no ISO control text embedded",
-      "statusNote": "Certification requires an accredited certification body."
+      "statusNote": "Profile metadata includes the published ISO/IEC 27001:2022/Amd 1:2024 amendment; certification requires an accredited certification body."
     },
     {
       "id": "nist-800-53-r5",
@@ -92,14 +92,36 @@
       "category": "governance",
       "severity": "high",
       "evidenceType": "governance.policy_inventory",
-      "condition": { "fact": "approved_and_current", "operator": "equals", "expected": true },
+      "condition": {
+        "fact": "approved_and_current",
+        "operator": "equals",
+        "expected": true
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "GV.PO-01" },
-        { "frameworkId": "nist-800-53-r5", "reference": "PL-1" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Clause 5.2; Annex A 5.1" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC1.1" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.316(a)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 24" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "GV.PO-01"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "PL-1"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Clause 5.2; Annex A 5.1"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC1.1"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.316(a)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 24"
+        }
       ],
       "remediation": "Assign owners, approve a versioned policy set, record review dates, and retain approval evidence."
     },
@@ -109,14 +131,36 @@
       "category": "governance",
       "severity": "high",
       "evidenceType": "governance.risk_register",
-      "condition": { "fact": "current_and_owned", "operator": "equals", "expected": true },
+      "condition": {
+        "fact": "current_and_owned",
+        "operator": "equals",
+        "expected": true
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "GV.RM-01" },
-        { "frameworkId": "nist-800-53-r5", "reference": "RA-3" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Clause 6.1.2" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC3.2" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(1)(ii)(A)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 32" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "GV.RM-01"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "RA-3"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Clause 6.1.2"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC3.2"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(a)(1)(ii)(A)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 32"
+        }
       ],
       "remediation": "Document risks, likelihood, impact, owners, treatment, acceptance authority, and review cadence."
     },
@@ -126,13 +170,32 @@
       "category": "governance",
       "severity": "medium",
       "evidenceType": "governance.applicability",
-      "condition": { "fact": "reviewed", "operator": "equals", "expected": true },
+      "condition": {
+        "fact": "reviewed",
+        "operator": "equals",
+        "expected": true
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "GV.OC-03" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Clause 4.2; Annex A 5.31" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC2.3" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.306" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Articles 3 and 24" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "GV.OC-03"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Clause 4.2; Annex A 5.31"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC2.3"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.306"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Articles 3 and 24"
+        }
       ],
       "remediation": "Maintain an applicability register with counsel-reviewed jurisdictions, contracts, data classes, and accountable owners."
     },
@@ -142,15 +205,40 @@
       "category": "technology",
       "severity": "high",
       "evidenceType": "assets.inventory",
-      "condition": { "fact": "coverage_percent", "operator": "number_at_least", "expected": 95 },
+      "condition": {
+        "fact": "coverage_percent",
+        "operator": "number_at_least",
+        "expected": 95
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "ID.AM-01" },
-        { "frameworkId": "nist-800-53-r5", "reference": "CM-8" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.9" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC6.1" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.310(d)(1)" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 2.4" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 1.1" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "ID.AM-01"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "CM-8"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 5.9"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC6.1"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.310(d)(1)"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 2.4"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 1.1"
+        }
       ],
       "remediation": "Reconcile cloud, endpoint, repository, SaaS, network, and owner inventories until material coverage is at least 95 percent."
     },
@@ -160,16 +248,44 @@
       "category": "identity",
       "severity": "critical",
       "evidenceType": "identity.mfa",
-      "condition": { "fact": "coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "condition": {
+        "fact": "coverage_percent",
+        "operator": "number_at_least",
+        "expected": 100
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "PR.AA-03" },
-        { "frameworkId": "nist-800-53-r5", "reference": "IA-2" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.17" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC6.1" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.312(d)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 32" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 8.4.2" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 6.5" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "PR.AA-03"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "IA-2"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 5.17"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC6.1"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.312(d)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 32"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 8.4.2"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 6.5"
+        }
       ],
       "remediation": "Eliminate MFA exceptions for privileged and workforce paths, prefer phishing-resistant factors, and monitor enrollment drift."
     },
@@ -179,14 +295,36 @@
       "category": "identity",
       "severity": "high",
       "evidenceType": "identity.access_review",
-      "condition": { "fact": "days_since_review", "operator": "number_at_most", "expected": 90 },
+      "condition": {
+        "fact": "days_since_review",
+        "operator": "number_at_most",
+        "expected": 90
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "PR.AA-05" },
-        { "frameworkId": "nist-800-53-r5", "reference": "AC-2" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.18" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC6.2" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(4)" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 7.2.5" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "PR.AA-05"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "AC-2"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 5.18"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC6.2"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(a)(4)"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 7.2.5"
+        }
       ],
       "remediation": "Run owner-attested access reviews at least quarterly and retain revocation, exception, and completion evidence."
     },
@@ -196,15 +334,40 @@
       "category": "data",
       "severity": "high",
       "evidenceType": "data.classification",
-      "condition": { "fact": "coverage_percent", "operator": "number_at_least", "expected": 95 },
+      "condition": {
+        "fact": "coverage_percent",
+        "operator": "number_at_least",
+        "expected": 95
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "ID.AM-07" },
-        { "frameworkId": "nist-800-53-r5", "reference": "MP-3" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.12" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "C1.1" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 5(1)(c)" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 3.2.1" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 3.2" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "ID.AM-07"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "MP-3"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 5.12"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "C1.1"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 5(1)(c)"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 3.2.1"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 3.2"
+        }
       ],
       "remediation": "Map data flows and stores, assign owners and classifications, and reconcile discovered stores against the inventory."
     },
@@ -214,16 +377,44 @@
       "category": "data",
       "severity": "critical",
       "evidenceType": "data.encryption",
-      "condition": { "fact": "at_rest_and_in_transit", "operator": "equals", "expected": true },
+      "condition": {
+        "fact": "at_rest_and_in_transit",
+        "operator": "equals",
+        "expected": true
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "PR.DS-01; PR.DS-02" },
-        { "frameworkId": "nist-800-53-r5", "reference": "SC-8; SC-28" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.24" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC6.7" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.312(a)(2)(iv)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 32(1)(a)" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirements 3.5.1 and 4.2.1" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 3.10" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "PR.DS-01; PR.DS-02"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "SC-8; SC-28"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 8.24"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC6.7"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.312(a)(2)(iv)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 32(1)(a)"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirements 3.5.1 and 4.2.1"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 3.10"
+        }
       ],
       "remediation": "Close plaintext paths, centralize key lifecycle management, and retain configuration and rotation evidence."
     },
@@ -233,15 +424,40 @@
       "category": "data",
       "severity": "high",
       "evidenceType": "data.retention",
-      "condition": { "fact": "policy_enforced", "operator": "equals", "expected": true },
+      "condition": {
+        "fact": "policy_enforced",
+        "operator": "equals",
+        "expected": true
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-800-53-r5", "reference": "MP-6" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.10" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "C1.2" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.316(b)(2)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 5(1)(e)" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 3.2.1" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 3.4" }
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "MP-6"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 8.10"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "C1.2"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.316(b)(2)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 5(1)(e)"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 3.2.1"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 3.4"
+        }
       ],
       "remediation": "Define retention by data class, automate deletion where possible, track legal holds, and test deletion outcomes."
     },
@@ -251,11 +467,24 @@
       "category": "privacy",
       "severity": "high",
       "evidenceType": "privacy.rights_requests",
-      "condition": { "fact": "workflow_exercised", "operator": "equals", "expected": true },
+      "condition": {
+        "fact": "workflow_exercised",
+        "operator": "equals",
+        "expected": true
+      },
       "frameworkMappings": [
-        { "frameworkId": "gdpr-2016-679", "reference": "Articles 12 through 22" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "P4.1; P5.1" },
-        { "frameworkId": "nist-800-53-r5", "reference": "IP-2" }
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Articles 12 through 22"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "P4.1; P5.1"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "IP-2"
+        }
       ],
       "remediation": "Document intake, identity verification, discovery, review, response, denial, and deadline escalation; exercise the workflow."
     },
@@ -265,15 +494,40 @@
       "category": "vendors",
       "severity": "high",
       "evidenceType": "vendors.assurance",
-      "condition": { "fact": "coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "condition": {
+        "fact": "coverage_percent",
+        "operator": "number_at_least",
+        "expected": 100
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "GV.SC-06" },
-        { "frameworkId": "nist-800-53-r5", "reference": "SA-9" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.19; 5.20" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC9.2" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(b)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 28" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 12.8" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "GV.SC-06"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "SA-9"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 5.19; 5.20"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC9.2"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(b)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 28"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 12.8"
+        }
       ],
       "remediation": "Tier material vendors, complete recurring due diligence, bind security and privacy duties in contracts, and monitor exceptions."
     },
@@ -283,14 +537,36 @@
       "category": "secure-change",
       "severity": "high",
       "evidenceType": "change.protection",
-      "condition": { "fact": "protected_path_percent", "operator": "number_at_least", "expected": 100 },
+      "condition": {
+        "fact": "protected_path_percent",
+        "operator": "number_at_least",
+        "expected": 100
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "PR.PS-06" },
-        { "frameworkId": "nist-800-53-r5", "reference": "CM-3" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.32" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC8.1" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 6.5.2" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 16.4" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "PR.PS-06"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "CM-3"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 8.32"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC8.1"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 6.5.2"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 16.4"
+        }
       ],
       "remediation": "Require reviewed changes, protected branches, immutable build inputs, separation of duties, and deployment evidence for every production path."
     },
@@ -300,14 +576,36 @@
       "category": "vulnerability-management",
       "severity": "critical",
       "evidenceType": "vulnerability.remediation",
-      "condition": { "fact": "critical_overdue_count", "operator": "number_at_most", "expected": 0 },
+      "condition": {
+        "fact": "critical_overdue_count",
+        "operator": "number_at_most",
+        "expected": 0
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "PR.PS-02" },
-        { "frameworkId": "nist-800-53-r5", "reference": "RA-5; SI-2" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.8" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC7.1" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirements 6.3.3 and 11.3" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 7.2" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "PR.PS-02"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "RA-5; SI-2"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 8.8"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC7.1"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirements 6.3.3 and 11.3"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 7.2"
+        }
       ],
       "remediation": "Triage critical findings immediately, enforce remediation SLAs, document time-bounded exceptions, and retest closure."
     },
@@ -317,15 +615,40 @@
       "category": "logging-detection",
       "severity": "high",
       "evidenceType": "logging.coverage",
-      "condition": { "fact": "coverage_percent", "operator": "number_at_least", "expected": 95 },
+      "condition": {
+        "fact": "coverage_percent",
+        "operator": "number_at_least",
+        "expected": 95
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "DE.CM-01" },
-        { "frameworkId": "nist-800-53-r5", "reference": "AU-2; AU-6" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.15; 8.16" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC7.2" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.312(b)" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 10.2.1" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 8.2" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "DE.CM-01"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "AU-2; AU-6"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 8.15; 8.16"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC7.2"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.312(b)"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 10.2.1"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 8.2"
+        }
       ],
       "remediation": "Inventory material telemetry, close collection gaps, protect log integrity, set retention, and exercise detection-to-response routing."
     },
@@ -335,16 +658,44 @@
       "category": "incident-response",
       "severity": "high",
       "evidenceType": "incident.exercise",
-      "condition": { "fact": "days_since_exercise", "operator": "number_at_most", "expected": 365 },
+      "condition": {
+        "fact": "days_since_exercise",
+        "operator": "number_at_most",
+        "expected": 365
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "RS.MA-01" },
-        { "frameworkId": "nist-800-53-r5", "reference": "IR-3" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.24; 5.27" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC7.4" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(6)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 33" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 12.10.2" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 17.3" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "RS.MA-01"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "IR-3"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 5.24; 5.27"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC7.4"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(a)(6)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 33"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 12.10.2"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 17.3"
+        }
       ],
       "remediation": "Exercise legal, privacy, security, communications, and executive roles at least annually and track corrective actions to closure."
     },
@@ -354,14 +705,36 @@
       "category": "resilience",
       "severity": "high",
       "evidenceType": "resilience.restore_test",
-      "condition": { "fact": "days_since_test", "operator": "number_at_most", "expected": 90 },
+      "condition": {
+        "fact": "days_since_test",
+        "operator": "number_at_most",
+        "expected": 90
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "RC.RP-03" },
-        { "frameworkId": "nist-800-53-r5", "reference": "CP-9" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.13" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "A1.2" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(7)(ii)(A)" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 11.5" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "RC.RP-03"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "CP-9"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 8.13"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "A1.2"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(a)(7)(ii)(A)"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 11.5"
+        }
       ],
       "remediation": "Run scoped restoration tests at least quarterly, measure recovery objectives, and resolve failed or partial restores."
     },
@@ -371,16 +744,44 @@
       "category": "workforce",
       "severity": "medium",
       "evidenceType": "workforce.training",
-      "condition": { "fact": "completion_percent", "operator": "number_at_least", "expected": 95 },
+      "condition": {
+        "fact": "completion_percent",
+        "operator": "number_at_least",
+        "expected": 95
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "PR.AT-01" },
-        { "frameworkId": "nist-800-53-r5", "reference": "AT-2" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 6.3" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC2.2" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(5)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 39(1)(b)" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 12.6.2" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 14.1" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "PR.AT-01"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "AT-2"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 6.3"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC2.2"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(a)(5)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 39(1)(b)"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 12.6.2"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 14.1"
+        }
       ],
       "remediation": "Deliver role-aware onboarding and recurring training, follow up on overdue learners, and retain completion evidence."
     },
@@ -390,16 +791,44 @@
       "category": "application-security",
       "severity": "critical",
       "evidenceType": "runtime.exposure",
-      "condition": { "fact": "suspected_secret_count", "operator": "number_at_most", "expected": 0 },
+      "condition": {
+        "fact": "suspected_secret_count",
+        "operator": "number_at_most",
+        "expected": 0
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "PR.DS-01" },
-        { "frameworkId": "nist-800-53-r5", "reference": "SC-28" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.12" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC6.1" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.312(a)(1)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 32" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 3.5.1" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 3.11" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "PR.DS-01"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "SC-28"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 8.12"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC6.1"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.312(a)(1)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 32"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 3.5.1"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 3.11"
+        }
       ],
       "remediation": "Remove exposed values from runtime exports, rotate confirmed credentials through the approved process, add regression probes, and preserve only fingerprints in evidence."
     },
@@ -409,11 +838,24 @@
       "category": "ai-governance",
       "severity": "medium",
       "evidenceType": "ai.inventory",
-      "condition": { "fact": "material_use_cases_inventory_complete", "operator": "equals", "expected": true },
+      "condition": {
+        "fact": "material_use_cases_inventory_complete",
+        "operator": "equals",
+        "expected": true
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-ai-rmf-1.0", "reference": "MAP 1.6" },
-        { "frameworkId": "nist-csf-2.0", "reference": "ID.AM-07" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Articles 25 and 35" }
+        {
+          "frameworkId": "nist-ai-rmf-1.0",
+          "reference": "MAP 1.6"
+        },
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "ID.AM-07"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Articles 25 and 35"
+        }
       ],
       "remediation": "Inventory internally built and third-party AI systems, owners, purposes, data, affected people, evaluations, and retirement status."
     },
@@ -423,11 +865,24 @@
       "category": "ai-governance",
       "severity": "high",
       "evidenceType": "ai.evaluation",
-      "condition": { "fact": "material_system_coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "condition": {
+        "fact": "material_system_coverage_percent",
+        "operator": "number_at_least",
+        "expected": 100
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-ai-rmf-1.0", "reference": "MEASURE 1; MANAGE 2" },
-        { "frameworkId": "nist-csf-2.0", "reference": "GV.RM-06" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Articles 25 and 35" }
+        {
+          "frameworkId": "nist-ai-rmf-1.0",
+          "reference": "MEASURE 1; MANAGE 2"
+        },
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "GV.RM-06"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Articles 25 and 35"
+        }
       ],
       "remediation": "Define risk-based evaluations, acceptance thresholds, human review, monitoring, incident handling, and evidence for every material AI system."
     },
@@ -437,14 +892,36 @@
       "category": "governance",
       "severity": "high",
       "evidenceType": "governance.internal-audit",
-      "condition": { "fact": "in_scope_control_coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "condition": {
+        "fact": "in_scope_control_coverage_percent",
+        "operator": "number_at_least",
+        "expected": 100
+      },
       "frameworkMappings": [
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Clause 9.2" },
-        { "frameworkId": "nist-csf-2.0", "reference": "GV.OV-01" },
-        { "frameworkId": "nist-800-53-r5", "reference": "CA-2" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC4.1" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(8)" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 12.4.2" }
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Clause 9.2"
+        },
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "GV.OV-01"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "CA-2"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC4.1"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(a)(8)"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 12.4.2"
+        }
       ],
       "remediation": "Establish a risk-based internal audit schedule, preserve scope and procedure records, separate preparation from review, and track corrective actions."
     },
@@ -454,12 +931,28 @@
       "category": "governance",
       "severity": "high",
       "evidenceType": "governance.management-review",
-      "condition": { "fact": "review_overdue_days", "operator": "number_at_most", "expected": 0 },
+      "condition": {
+        "fact": "review_overdue_days",
+        "operator": "number_at_most",
+        "expected": 0
+      },
       "frameworkMappings": [
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Clause 9.3" },
-        { "frameworkId": "nist-csf-2.0", "reference": "GV.OV-02" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC1.2 and CC4.1" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(8)" }
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Clause 9.3"
+        },
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "GV.OV-02"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC1.2 and CC4.1"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(a)(8)"
+        }
       ],
       "remediation": "Schedule management reviews with required inputs, decisions, accountable owners, target dates, and retained minutes."
     },
@@ -469,16 +962,44 @@
       "category": "identity",
       "severity": "critical",
       "evidenceType": "identity.lifecycle",
-      "condition": { "fact": "timely_lifecycle_coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "condition": {
+        "fact": "timely_lifecycle_coverage_percent",
+        "operator": "number_at_least",
+        "expected": 100
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "PR.AA-05" },
-        { "frameworkId": "nist-800-53-r5", "reference": "AC-2" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.16 and 5.18" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC6.2 and CC6.3" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(3)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 32" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirements 7.2 and 8.2" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguards 5.1 and 6.1" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "PR.AA-05"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "AC-2"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 5.16 and 5.18"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC6.2 and CC6.3"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(a)(3)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 32"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirements 7.2 and 8.2"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguards 5.1 and 6.1"
+        }
       ],
       "remediation": "Integrate authoritative workforce events with access provisioning, approval, role-change review, rapid termination, and reconciliation."
     },
@@ -488,16 +1009,44 @@
       "category": "identity",
       "severity": "critical",
       "evidenceType": "identity.privileged-access",
-      "condition": { "fact": "unmanaged_privileged_identity_count", "operator": "number_at_most", "expected": 0 },
+      "condition": {
+        "fact": "unmanaged_privileged_identity_count",
+        "operator": "number_at_most",
+        "expected": 0
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "PR.AA-05" },
-        { "frameworkId": "nist-800-53-r5", "reference": "AC-6" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.2" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC6.3" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.312(a)(1)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 32" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 7.2.1" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 5.4" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "PR.AA-05"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "AC-6"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 8.2"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC6.3"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.312(a)(1)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 32"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 7.2.1"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 5.4"
+        }
       ],
       "remediation": "Inventory privileged identities, require separate named accounts and MFA, apply just-in-time authorization where possible, and review usage."
     },
@@ -507,16 +1056,44 @@
       "category": "data-protection",
       "severity": "critical",
       "evidenceType": "data.key-management",
-      "condition": { "fact": "unmanaged_material_key_count", "operator": "number_at_most", "expected": 0 },
+      "condition": {
+        "fact": "unmanaged_material_key_count",
+        "operator": "number_at_most",
+        "expected": 0
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "PR.DS-01 and PR.DS-02" },
-        { "frameworkId": "nist-800-53-r5", "reference": "SC-12" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.24" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC6.1" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.312(a)(2)(iv) and (e)(2)(ii)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 32" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 3.6" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 3.11" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "PR.DS-01 and PR.DS-02"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "SC-12"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 8.24"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC6.1"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.312(a)(2)(iv) and (e)(2)(ii)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 32"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 3.6"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 3.11"
+        }
       ],
       "remediation": "Centralize material keys, separate key administration from data access, define cryptoperiods, rotate, revoke, recover, and log all key lifecycle activity."
     },
@@ -526,13 +1103,32 @@
       "category": "privacy",
       "severity": "high",
       "evidenceType": "privacy.processing-inventory",
-      "condition": { "fact": "material_processing_coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "condition": {
+        "fact": "material_processing_coverage_percent",
+        "operator": "number_at_least",
+        "expected": 100
+      },
       "frameworkMappings": [
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 30" },
-        { "frameworkId": "nist-csf-2.0", "reference": "ID.AM-07" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.9 and 5.34" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "P3.1" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(1)" }
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 30"
+        },
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "ID.AM-07"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 5.9 and 5.34"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "P3.1"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(a)(1)"
+        }
       ],
       "remediation": "Maintain owners, purposes, legal bases, categories, recipients, transfers, retention, systems, subprocessors, and security measures for every material processing activity."
     },
@@ -542,13 +1138,32 @@
       "category": "privacy",
       "severity": "high",
       "evidenceType": "privacy.impact-assessment",
-      "condition": { "fact": "overdue_high_risk_assessment_count", "operator": "number_at_most", "expected": 0 },
+      "condition": {
+        "fact": "overdue_high_risk_assessment_count",
+        "operator": "number_at_most",
+        "expected": 0
+      },
       "frameworkMappings": [
-        { "frameworkId": "gdpr-2016-679", "reference": "Articles 25 and 35" },
-        { "frameworkId": "nist-ai-rmf-1.0", "reference": "MAP 1 and MAP 5" },
-        { "frameworkId": "nist-csf-2.0", "reference": "GV.RM-03" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.34" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "P4.1" }
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Articles 25 and 35"
+        },
+        {
+          "frameworkId": "nist-ai-rmf-1.0",
+          "reference": "MAP 1 and MAP 5"
+        },
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "GV.RM-03"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 5.34"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "P4.1"
+        }
       ],
       "remediation": "Add a risk trigger to product and vendor intake, document necessity and proportionality, consult required stakeholders, approve mitigations, and reassess changes."
     },
@@ -558,14 +1173,36 @@
       "category": "privacy",
       "severity": "critical",
       "evidenceType": "privacy.breach-response",
-      "condition": { "fact": "deadline_aware_workflow_tested", "operator": "equals", "expected": true },
+      "condition": {
+        "fact": "deadline_aware_workflow_tested",
+        "operator": "equals",
+        "expected": true
+      },
       "frameworkMappings": [
-        { "frameworkId": "gdpr-2016-679", "reference": "Articles 33 and 34" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR Parts 164.400-414" },
-        { "frameworkId": "nist-csf-2.0", "reference": "RS.CO-02 and RS.CO-03" },
-        { "frameworkId": "nist-800-53-r5", "reference": "IR-6" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.24 through 5.28" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC7.4" }
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Articles 33 and 34"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR Parts 164.400-414"
+        },
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "RS.CO-02 and RS.CO-03"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "IR-6"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 5.24 through 5.28"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC7.4"
+        }
       ],
       "remediation": "Maintain jurisdiction-aware decision trees, clocks, escalation paths, regulator and individual notification templates, legal review, and exercise evidence."
     },
@@ -575,13 +1212,32 @@
       "category": "privacy",
       "severity": "high",
       "evidenceType": "privacy.processor-contracts",
-      "condition": { "fact": "required_contract_coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "condition": {
+        "fact": "required_contract_coverage_percent",
+        "operator": "number_at_least",
+        "expected": 100
+      },
       "frameworkMappings": [
-        { "frameworkId": "gdpr-2016-679", "reference": "Articles 28 and 46" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(b) and 164.502(e)" },
-        { "frameworkId": "nist-csf-2.0", "reference": "GV.SC-05" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.20 and 5.21" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC9.2" }
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Articles 28 and 46"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(b) and 164.502(e)"
+        },
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "GV.SC-05"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 5.20 and 5.21"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC9.2"
+        }
       ],
       "remediation": "Inventory processors and business associates, execute required terms before access, control transfers and subprocessors, and monitor renewal and termination obligations."
     },
@@ -591,16 +1247,44 @@
       "category": "third-party-risk",
       "severity": "high",
       "evidenceType": "vendors.monitoring",
-      "condition": { "fact": "overdue_material_vendor_review_count", "operator": "number_at_most", "expected": 0 },
+      "condition": {
+        "fact": "overdue_material_vendor_review_count",
+        "operator": "number_at_most",
+        "expected": 0
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "GV.SC-06 through GV.SC-10" },
-        { "frameworkId": "nist-800-53-r5", "reference": "SR-6" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.19 through 5.22" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC9.2" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(b)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 28" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 12.8" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 15.4" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "GV.SC-06 through GV.SC-10"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "SR-6"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 5.19 through 5.22"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC9.2"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(b)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 28"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 12.8"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 15.4"
+        }
       ],
       "remediation": "Tier vendors by inherent risk, monitor material changes and assurance, review on schedule, track exceptions, and execute secure offboarding."
     },
@@ -610,16 +1294,44 @@
       "category": "vulnerability-management",
       "severity": "critical",
       "evidenceType": "vulnerability.patch-management",
-      "condition": { "fact": "critical_patch_sla_breach_count", "operator": "number_at_most", "expected": 0 },
+      "condition": {
+        "fact": "critical_patch_sla_breach_count",
+        "operator": "number_at_most",
+        "expected": 0
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "ID.RA-01 and PR.PS-02" },
-        { "frameworkId": "nist-800-53-r5", "reference": "SI-2" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.8" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC7.1" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(5)(ii)(B)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 32" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 6.3.3" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 7.4" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "ID.RA-01 and PR.PS-02"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "SI-2"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 8.8"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC7.1"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(a)(5)(ii)(B)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 32"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 6.3.3"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 7.4"
+        }
       ],
       "remediation": "Define severity- and exposure-aware patch deadlines, test and deploy fixes, document exceptions and compensating controls, and verify closure."
     },
@@ -629,16 +1341,44 @@
       "category": "application-security",
       "severity": "high",
       "evidenceType": "application.secure-development",
-      "condition": { "fact": "protected_release_coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "condition": {
+        "fact": "protected_release_coverage_percent",
+        "operator": "number_at_least",
+        "expected": 100
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "PR.PS-06" },
-        { "frameworkId": "nist-800-53-r5", "reference": "SA-11" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.25 through 8.31" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC8.1" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(1)(ii)(B)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Article 25" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 6.2" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 16.1" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "PR.PS-06"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "SA-11"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 8.25 through 8.31"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC8.1"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(a)(1)(ii)(B)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Article 25"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 6.2"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 16.1"
+        }
       ],
       "remediation": "Apply threat modeling, peer review, automated security tests, dependency and secret checks, approval, traceability, and rollback controls to every material release."
     },
@@ -648,16 +1388,44 @@
       "category": "incident-response",
       "severity": "critical",
       "evidenceType": "incident.response-plan",
-      "condition": { "fact": "approved_and_current", "operator": "equals", "expected": true },
+      "condition": {
+        "fact": "approved_and_current",
+        "operator": "equals",
+        "expected": true
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "RS.MA-01 and RS.MA-02" },
-        { "frameworkId": "nist-800-53-r5", "reference": "IR-8" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.24 through 5.28" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC7.4" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(6)" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Articles 33 and 34" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 12.10" },
-        { "frameworkId": "cis-controls-8.1", "reference": "Safeguard 17.4" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "RS.MA-01 and RS.MA-02"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "IR-8"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 5.24 through 5.28"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC7.4"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(a)(6)"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Articles 33 and 34"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 12.10"
+        },
+        {
+          "frameworkId": "cis-controls-8.1",
+          "reference": "Safeguard 17.4"
+        }
       ],
       "remediation": "Approve severity definitions, roles, contact paths, playbooks, evidence preservation, legal and privacy escalation, communications, recovery, and lessons-learned workflow."
     },
@@ -667,14 +1435,36 @@
       "category": "resilience",
       "severity": "high",
       "evidenceType": "resilience.business-continuity",
-      "condition": { "fact": "material_service_coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "condition": {
+        "fact": "material_service_coverage_percent",
+        "operator": "number_at_least",
+        "expected": 100
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-csf-2.0", "reference": "RC.RP-01 through RC.RP-06" },
-        { "frameworkId": "nist-800-53-r5", "reference": "CP-2" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 5.29 and 5.30" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "A1.2 and A1.3" },
-        { "frameworkId": "hipaa-security-rule", "reference": "45 CFR 164.308(a)(7)" },
-        { "frameworkId": "pci-dss-4.0.1", "reference": "Requirement 12.10.1" }
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "RC.RP-01 through RC.RP-06"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "CP-2"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 5.29 and 5.30"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "A1.2 and A1.3"
+        },
+        {
+          "frameworkId": "hipaa-security-rule",
+          "reference": "45 CFR 164.308(a)(7)"
+        },
+        {
+          "frameworkId": "pci-dss-4.0.1",
+          "reference": "Requirement 12.10.1"
+        }
       ],
       "remediation": "Perform business impact analysis, set approved recovery objectives, map people and third-party dependencies, document continuity strategies, and exercise them."
     },
@@ -684,14 +1474,36 @@
       "category": "ai-governance",
       "severity": "high",
       "evidenceType": "ai.monitoring",
-      "condition": { "fact": "material_system_monitoring_coverage_percent", "operator": "number_at_least", "expected": 100 },
+      "condition": {
+        "fact": "material_system_monitoring_coverage_percent",
+        "operator": "number_at_least",
+        "expected": 100
+      },
       "frameworkMappings": [
-        { "frameworkId": "nist-ai-rmf-1.0", "reference": "MEASURE 2 and MANAGE 4" },
-        { "frameworkId": "nist-csf-2.0", "reference": "DE.CM-09 and RS.MA-02" },
-        { "frameworkId": "nist-800-53-r5", "reference": "SI-4" },
-        { "frameworkId": "iso-iec-27001-2022", "reference": "Annex A 8.16" },
-        { "frameworkId": "gdpr-2016-679", "reference": "Articles 22, 25 and 35" },
-        { "frameworkId": "soc2-tsc-2017-2022", "reference": "CC7.2 and CC7.4" }
+        {
+          "frameworkId": "nist-ai-rmf-1.0",
+          "reference": "MEASURE 2 and MANAGE 4"
+        },
+        {
+          "frameworkId": "nist-csf-2.0",
+          "reference": "DE.CM-09 and RS.MA-02"
+        },
+        {
+          "frameworkId": "nist-800-53-r5",
+          "reference": "SI-4"
+        },
+        {
+          "frameworkId": "iso-iec-27001-2022",
+          "reference": "Annex A 8.16"
+        },
+        {
+          "frameworkId": "gdpr-2016-679",
+          "reference": "Articles 22, 25 and 35"
+        },
+        {
+          "frameworkId": "soc2-tsc-2017-2022",
+          "reference": "CC7.2 and CC7.4"
+        }
       ],
       "remediation": "Monitor quality, safety, privacy, security, drift, abuse, and human-override signals; define thresholds, escalation, rollback, notification, and learning loops."
     }
