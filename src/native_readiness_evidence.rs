@@ -98,12 +98,13 @@ pub fn native_readiness_to_evidence(
             ),
         });
     }
-    let valid_until = collected_at
-        .checked_add(valid_for_seconds)
-        .ok_or_else(|| AuditError::Invalid {
-            field: "nativeReadinessFreshness",
-            reason: "validUntil overflowed".to_owned(),
-        })?;
+    let valid_until =
+        collected_at
+            .checked_add(valid_for_seconds)
+            .ok_or_else(|| AuditError::Invalid {
+                field: "nativeReadinessFreshness",
+                reason: "validUntil overflowed".to_owned(),
+            })?;
 
     let report: NativeScanReport = serde_json::from_slice(report_json)?;
     if !PROVIDERS.contains(&report.provider.as_str()) {
@@ -344,18 +345,21 @@ mod tests {
 
     #[test]
     fn rejects_unrecognized_transport_even_for_known_provider() {
-        let text = String::from_utf8(report()).expect("fixture is utf8");
+        let fixture = report();
+        let text = String::from_utf8_lossy(&fixture);
         let input = text
             .replace("allowlisted aws CLI API calls", "arbitrary shell")
             .into_bytes();
-        assert!(native_readiness_to_evidence(
-            "tenant-a",
-            "organization/acme",
-            1_700_000_000,
-            300,
-            "mcp@1",
-            &input,
-        )
-        .is_err());
+        assert!(
+            native_readiness_to_evidence(
+                "tenant-a",
+                "organization/acme",
+                1_700_000_000,
+                300,
+                "mcp@1",
+                &input,
+            )
+            .is_err()
+        );
     }
 }
