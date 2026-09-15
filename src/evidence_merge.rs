@@ -22,9 +22,7 @@ use crate::model::{EVIDENCE_SCHEMA, EvidenceBundle, EvidenceObservation};
 /// Returns [`AuditError`] if any bundle is invalid, bundle tenant/scope values differ, a
 /// duplicate external identifier carries conflicting content, or the merged bundle exceeds
 /// normal `EvidenceBundle` limits.
-pub fn merge_evidence_bundles(
-    bundles: &[EvidenceBundle],
-) -> Result<EvidenceBundle, AuditError> {
+pub fn merge_evidence_bundles(bundles: &[EvidenceBundle]) -> Result<EvidenceBundle, AuditError> {
     let first = bundles.first().ok_or_else(|| AuditError::Invalid {
         field: "evidenceBundles",
         reason: "at least one evidence bundle is required".to_owned(),
@@ -109,8 +107,8 @@ mod tests {
     }
 
     #[test]
-    fn merge_is_order_independent_and_deduplicates_identical_observations(
-    ) -> Result<(), AuditError> {
+    fn merge_is_order_independent_and_deduplicates_identical_observations() -> Result<(), AuditError>
+    {
         let one = bundle(vec![observation("a", true), observation("b", false)]);
         let two = bundle(vec![observation("b", false), observation("c", true)]);
         let forward = merge_evidence_bundles(&[one.clone(), two.clone()])?;
