@@ -35,27 +35,24 @@ jobs:
               ['git', 'show', 'origin/main:programs/baseline-v1.json'],
               text=True,
           )
-          old = '''    {
-            "id": "iso-iec-27001-2022",
-            "title": "ISO/IEC 27001 Information Security Management Systems",
-            "version": "2022",
-            "authority": "ISO and IEC",
-            "sourceUrl": "https://www.iso.org/standard/82875.html",
-            "redistribution": "reference-only; no ISO control text embedded",
-            "statusNote": "Certification requires an accredited certification body."
-          },'''
-          new = '''    {
-            "id": "iso-iec-27001-2022",
-            "title": "ISO/IEC 27001 Information Security Management Systems",
-            "version": "2022 + Amd 1:2024",
-            "authority": "ISO and IEC",
-            "sourceUrl": "https://www.iso.org/standard/27001",
-            "redistribution": "reference-only; no ISO control text embedded",
-            "statusNote": "Profile metadata includes the published ISO/IEC 27001:2022/Amd 1:2024 amendment; certification requires an accredited certification body."
-          },'''
-          if original.count(old) != 1:
-              raise SystemExit('expected exact ISO framework block once on main')
-          Path('programs/baseline-v1.json').write_text(original.replace(old, new, 1))
+          marker = '"id": "iso-iec-27001-2022"'
+          start = original.index(marker)
+          object_start = original.rfind('    {', 0, start)
+          object_end = original.index('\n    },', start) + len('\n    },')
+          block = original[object_start:object_end]
+
+          replacements = {
+              '"version": "2022"': '"version": "2022 + Amd 1:2024"',
+              '"sourceUrl": "https://www.iso.org/standard/82875.html"': '"sourceUrl": "https://www.iso.org/standard/27001"',
+              '"statusNote": "Certification requires an accredited certification body."': '"statusNote": "Profile metadata includes the published ISO/IEC 27001:2022/Amd 1:2024 amendment; certification requires an accredited certification body."',
+          }
+          for old, new in replacements.items():
+              if block.count(old) != 1:
+                  raise SystemExit(f'expected ISO field exactly once: {old}')
+              block = block.replace(old, new, 1)
+
+          repaired = original[:object_start] + block + original[object_end:]
+          Path('programs/baseline-v1.json').write_text(repaired)
 
       - name: Install pinned Rust toolchain
         shell: bash
