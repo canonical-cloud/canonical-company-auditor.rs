@@ -1,0 +1,126 @@
+name: one-shot ISO amendment metadata refresh
+
+on:
+  push:
+    branches: [audit/iso-amendment-freshness-20260915]
+    paths:
+      - '.github/workflows/iso-amendment-refresh-once.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: iso-amendment-refresh-once
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    if: github.repository == 'canonical-cloud/canonical-company-auditor.rs' && github.ref == 'refs/heads/audit/iso-amendment-freshness-20260915'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - name: Check out exact feature branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: audit/iso-amendment-freshness-20260915
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Refresh ISO framework metadata and regression coverage
+        shell: python
+        run: |
+          from pathlib import Path
+
+          program = Path('programs/baseline-v1.json')
+          text = program.read_text(encoding='utf-8')
+          old = '''      "id": "iso-iec-27001-2022",
+              "title": "ISO/IEC 27001 Information Security Management Systems",
+              "version": "2022",
+              "authority": "ISO and IEC",
+              "sourceUrl": "https://www.iso.org/standard/82875.html",
+              "redistribution": "reference-only; no ISO control text embedded",
+              "statusNote": "Certification requires an accredited certification body."'''
+          new = '''      "id": "iso-iec-27001-2022",
+              "title": "ISO/IEC 27001 Information Security Management Systems",
+              "version": "2022 + Amd 1:2024",
+              "authority": "ISO and IEC",
+              "sourceUrl": "https://www.iso.org/standard/27001",
+              "redistribution": "reference-only; no ISO control text embedded",
+              "statusNote": "Profile metadata includes the published ISO/IEC 27001:2022/Amd 1:2024 amendment; certification requires an accredited certification body."'''
+          if old not in text:
+              raise SystemExit('expected ISO framework metadata block not found')
+          program.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          test = Path('tests/e2e.rs')
+          text = test.read_text(encoding='utf-8')
+          marker = '''
+#[test]
+fn iso_profile_tracks_published_2024_amendment() -> Result<(), Box<dyn Error>> {
+    let program: serde_json::Value =
+        serde_json::from_str(include_str!("../programs/baseline-v1.json"))?;
+    let frameworks = program["frameworks"]
+        .as_array()
+        .ok_or("frameworks must be an array")?;
+    let iso = frameworks
+        .iter()
+        .find(|framework| framework["id"].as_str() == Some("iso-iec-27001-2022"))
+        .ok_or("ISO/IEC 27001 profile missing")?;
+
+    assert_eq!(iso["version"].as_str(), Some("2022 + Amd 1:2024"));
+    assert_eq!(
+        iso["sourceUrl"].as_str(),
+        Some("https://www.iso.org/standard/27001")
+    );
+    assert!(
+        iso["statusNote"]
+            .as_str()
+            .is_some_and(|note| note.contains("ISO/IEC 27001:2022/Amd 1:2024"))
+    );
+    Ok(())
+}
+'''
+          if 'fn iso_profile_tracks_published_2024_amendment' not in text:
+              test.write_text(text.rstrip() + '\n' + marker, encoding='utf-8')
+
+      - name: Remove one-shot workflow before validation
+        shell: bash
+        run: git rm -- .github/workflows/iso-amendment-refresh-once.yml
+
+      - name: Install pinned Rust toolchain
+        shell: bash
+        run: rustup toolchain install 1.95.0 --profile minimal --component rustfmt,clippy --no-self-update
+
+      - name: Validate exact durable change
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m json.tool programs/baseline-v1.json >/dev/null
+          cargo +1.95.0 fmt --all -- --check
+          cargo +1.95.0 test --locked --all-targets
+          cargo +1.95.0 clippy --locked --all-targets -- -D warnings
+          git diff --check
+
+      - name: Commit verified framework freshness change
+        id: commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- programs/baseline-v1.json tests/e2e.rs
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'readiness: account for ISO 27001 amendment 1:2024'
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+
+      - name: Publish verified change
+        if: steps.commit.outputs.changed == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          basic="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $basic" \
+            push origin HEAD:refs/heads/audit/iso-amendment-freshness-20260915
