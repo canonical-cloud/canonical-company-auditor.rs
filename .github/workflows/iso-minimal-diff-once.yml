@@ -1,0 +1,96 @@
+name: one-shot ISO minimal diff repair
+
+on:
+  push:
+    branches: [audit/iso-amendment-freshness-20260915]
+    paths:
+      - '.github/workflows/iso-minimal-diff-once.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repair:
+    if: github.repository == 'canonical-cloud/canonical-company-auditor.rs' && github.ref == 'refs/heads/audit/iso-amendment-freshness-20260915'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - name: Check out exact feature branch with main history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: audit/iso-amendment-freshness-20260915
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Restore baseline formatting and apply only ISO metadata edits
+        shell: python
+        run: |
+          from pathlib import Path
+          import subprocess
+
+          original = subprocess.check_output(
+              ['git', 'show', 'origin/main:programs/baseline-v1.json'],
+              text=True,
+          )
+          old = '''    {
+            "id": "iso-iec-27001-2022",
+            "title": "ISO/IEC 27001 Information Security Management Systems",
+            "version": "2022",
+            "authority": "ISO and IEC",
+            "sourceUrl": "https://www.iso.org/standard/82875.html",
+            "redistribution": "reference-only; no ISO control text embedded",
+            "statusNote": "Certification requires an accredited certification body."
+          },'''
+          new = '''    {
+            "id": "iso-iec-27001-2022",
+            "title": "ISO/IEC 27001 Information Security Management Systems",
+            "version": "2022 + Amd 1:2024",
+            "authority": "ISO and IEC",
+            "sourceUrl": "https://www.iso.org/standard/27001",
+            "redistribution": "reference-only; no ISO control text embedded",
+            "statusNote": "Profile metadata includes the published ISO/IEC 27001:2022/Amd 1:2024 amendment; certification requires an accredited certification body."
+          },'''
+          if original.count(old) != 1:
+              raise SystemExit('expected exact ISO framework block once on main')
+          Path('programs/baseline-v1.json').write_text(original.replace(old, new, 1))
+
+      - name: Install pinned Rust toolchain
+        shell: bash
+        run: rustup toolchain install 1.95.0 --profile minimal --component rustfmt,clippy --no-self-update
+
+      - name: Validate minimal durable diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m json.tool programs/baseline-v1.json >/dev/null
+          cargo +1.95.0 fmt --all -- --check
+          cargo +1.95.0 test --locked --all-targets
+          cargo +1.95.0 clippy --locked --all-targets -- -D warnings
+          git diff --check
+          changed="$(git diff --numstat origin/main -- programs/baseline-v1.json | awk '{print $1+$2}')"
+          test "$changed" -le 6
+
+      - name: Commit repaired baseline only
+        id: commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- programs/baseline-v1.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'readiness: keep ISO amendment diff surgical'
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+
+      - name: Publish repaired baseline
+        if: steps.commit.outputs.changed == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          basic="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $basic" \
+            push origin HEAD:refs/heads/audit/iso-amendment-freshness-20260915
