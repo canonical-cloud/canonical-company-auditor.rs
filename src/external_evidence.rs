@@ -37,7 +37,6 @@ const APPROVED_TOOLS: &[&str] = &[
 /// this boundary. Serde ignores those extra fields, which prevents them from becoming
 /// durable evidence while allowing the transport envelope to evolve independently.
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 struct ExternalScanReport {
     tool: String,
     provider: Option<String>,
@@ -151,16 +150,15 @@ pub fn external_scan_to_evidence(
         });
     }
 
-    let connector = format!("external.{}", report.tool);
     let source = EvidenceSource::Connector {
-        connector,
+        connector: format!("external.{}", report.tool),
         adapter_version: adapter_version.to_owned(),
     };
 
     let mut observations = Vec::with_capacity(report.findings.len() + 1);
     let mut run_facts = BTreeMap::from([
-        ("tool".to_owned(), json!(report.tool)),
-        ("status".to_owned(), json!(report.status)),
+        ("tool".to_owned(), json!(report.tool.clone())),
+        ("status".to_owned(), json!(report.status.clone())),
         ("readOnly".to_owned(), json!(true)),
         ("passed".to_owned(), json!(report.counts.passed)),
         ("failed".to_owned(), json!(report.counts.failed)),
@@ -186,7 +184,7 @@ pub fn external_scan_to_evidence(
         &report.tool,
         &report.provider,
         &report.status,
-        &report.counts.total_records,
+        report.counts.total_records,
     ))?;
     observations.push(EvidenceObservation {
         external_id: run_external_id,
@@ -201,19 +199,6 @@ pub fn external_scan_to_evidence(
 
     for finding in report.findings {
         validate_finding(&finding)?;
-        let mut facts = BTreeMap::<String, Value>::from([
-            ("tool".to_owned(), json!(report.tool)),
-            ("scannerFindingId".to_owned(), json!(finding.id)),
-            ("severity".to_owned(), json!(finding.severity)),
-            ("title".to_owned(), json!(finding.title)),
-            ("detail".to_owned(), json!(finding.detail)),
-        ]);
-        if let Some(provider) = report.provider.as_deref() {
-            facts.insert("provider".to_owned(), json!(provider));
-        }
-        if let Some(resource) = finding.resource.as_deref() {
-            facts.insert("resource".to_owned(), json!(resource));
-        }
         let finding_external_id = digest(&(
             "canonical.external-scanner-finding/v1",
             tenant_id,
@@ -226,6 +211,19 @@ pub fn external_scan_to_evidence(
             &finding.title,
             &finding.resource,
         ))?;
+        let mut facts = BTreeMap::<String, Value>::from([
+            ("tool".to_owned(), json!(report.tool.clone())),
+            ("scannerFindingId".to_owned(), json!(finding.id.clone())),
+            ("severity".to_owned(), json!(finding.severity.clone())),
+            ("title".to_owned(), json!(finding.title.clone())),
+            ("detail".to_owned(), json!(finding.detail.clone())),
+        ]);
+        if let Some(provider) = report.provider.as_deref() {
+            facts.insert("provider".to_owned(), json!(provider));
+        }
+        if let Some(resource) = finding.resource.as_deref() {
+            facts.insert("resource".to_owned(), json!(resource));
+        }
         observations.push(EvidenceObservation {
             external_id: finding_external_id,
             evidence_type: "scanner.finding".to_owned(),
@@ -361,9 +359,8 @@ mod tests {
 
     #[test]
     fn rejects_unapproved_scanner_identity() {
-        let mut input = report(true, "[]");
-        let text = String::from_utf8(input).expect("fixture is utf8");
-        input = text.replace("\"prowler\"", "\"arbitrary-tool\"").into_bytes();
+        let text = String::from_utf8(report(true, "[]")).expect("fixture is utf8");
+        let input = text.replace("\"prowler\"", "\"arbitrary-tool\"").into_bytes();
         let result = external_scan_to_evidence(
             "tenant-a",
             "organization/acme",
