@@ -32,62 +32,58 @@ jobs:
       - name: Refresh ISO framework metadata and regression coverage
         shell: python
         run: |
+          import json
           from pathlib import Path
 
-          program = Path('programs/baseline-v1.json')
-          text = program.read_text(encoding='utf-8')
-          old = '''      "id": "iso-iec-27001-2022",
-              "title": "ISO/IEC 27001 Information Security Management Systems",
-              "version": "2022",
-              "authority": "ISO and IEC",
-              "sourceUrl": "https://www.iso.org/standard/82875.html",
-              "redistribution": "reference-only; no ISO control text embedded",
-              "statusNote": "Certification requires an accredited certification body."'''
-          new = '''      "id": "iso-iec-27001-2022",
-              "title": "ISO/IEC 27001 Information Security Management Systems",
-              "version": "2022 + Amd 1:2024",
-              "authority": "ISO and IEC",
-              "sourceUrl": "https://www.iso.org/standard/27001",
-              "redistribution": "reference-only; no ISO control text embedded",
-              "statusNote": "Profile metadata includes the published ISO/IEC 27001:2022/Amd 1:2024 amendment; certification requires an accredited certification body."'''
-          if old not in text:
-              raise SystemExit('expected ISO framework metadata block not found')
-          program.write_text(text.replace(old, new, 1), encoding='utf-8')
+          program_path = Path('programs/baseline-v1.json')
+          program = json.loads(program_path.read_text(encoding='utf-8'))
+          iso = next(
+              (framework for framework in program['frameworks']
+               if framework.get('id') == 'iso-iec-27001-2022'),
+              None,
+          )
+          if iso is None:
+              raise SystemExit('ISO/IEC 27001 profile missing')
+          iso['version'] = '2022 + Amd 1:2024'
+          iso['sourceUrl'] = 'https://www.iso.org/standard/27001'
+          iso['statusNote'] = (
+              'Profile metadata includes the published ISO/IEC 27001:2022/Amd 1:2024 '
+              'amendment; certification requires an accredited certification body.'
+          )
+          program_path.write_text(
+              json.dumps(program, indent=2, ensure_ascii=False) + '\n',
+              encoding='utf-8',
+          )
 
-          test = Path('tests/e2e.rs')
-          text = test.read_text(encoding='utf-8')
-          marker = '''
-#[test]
-fn iso_profile_tracks_published_2024_amendment() -> Result<(), Box<dyn Error>> {
-    let program: serde_json::Value =
-        serde_json::from_str(include_str!("../programs/baseline-v1.json"))?;
-    let frameworks = program["frameworks"]
-        .as_array()
-        .ok_or("frameworks must be an array")?;
-    let iso = frameworks
-        .iter()
-        .find(|framework| framework["id"].as_str() == Some("iso-iec-27001-2022"))
-        .ok_or("ISO/IEC 27001 profile missing")?;
-
-    assert_eq!(iso["version"].as_str(), Some("2022 + Amd 1:2024"));
-    assert_eq!(
-        iso["sourceUrl"].as_str(),
-        Some("https://www.iso.org/standard/27001")
-    );
-    assert!(
-        iso["statusNote"]
-            .as_str()
-            .is_some_and(|note| note.contains("ISO/IEC 27001:2022/Amd 1:2024"))
-    );
-    Ok(())
-}
-'''
+          test_path = Path('tests/e2e.rs')
+          text = test_path.read_text(encoding='utf-8')
           if 'fn iso_profile_tracks_published_2024_amendment' not in text:
-              test.write_text(text.rstrip() + '\n' + marker, encoding='utf-8')
-
-      - name: Remove one-shot workflow before validation
-        shell: bash
-        run: git rm -- .github/workflows/iso-amendment-refresh-once.yml
+              marker = (
+                  '\n#[test]\n'
+                  'fn iso_profile_tracks_published_2024_amendment() -> Result<(), Box<dyn Error>> {\n'
+                  '    let program: serde_json::Value =\n'
+                  '        serde_json::from_str(include_str!("../programs/baseline-v1.json"))?;\n'
+                  '    let frameworks = program["frameworks"]\n'
+                  '        .as_array()\n'
+                  '        .ok_or("frameworks must be an array")?;\n'
+                  '    let iso = frameworks\n'
+                  '        .iter()\n'
+                  '        .find(|framework| framework["id"].as_str() == Some("iso-iec-27001-2022"))\n'
+                  '        .ok_or("ISO/IEC 27001 profile missing")?;\n\n'
+                  '    assert_eq!(iso["version"].as_str(), Some("2022 + Amd 1:2024"));\n'
+                  '    assert_eq!(\n'
+                  '        iso["sourceUrl"].as_str(),\n'
+                  '        Some("https://www.iso.org/standard/27001")\n'
+                  '    );\n'
+                  '    assert!(\n'
+                  '        iso["statusNote"]\n'
+                  '            .as_str()\n'
+                  '            .is_some_and(|note| note.contains("ISO/IEC 27001:2022/Amd 1:2024"))\n'
+                  '    );\n'
+                  '    Ok(())\n'
+                  '}\n'
+              )
+              test_path.write_text(text.rstrip() + '\n' + marker, encoding='utf-8')
 
       - name: Install pinned Rust toolchain
         shell: bash
