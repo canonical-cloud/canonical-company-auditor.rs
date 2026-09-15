@@ -232,7 +232,7 @@ mod tests {
 
     #[test]
     fn fingerprint_is_stable_across_collection_times() -> Result<(), AuditError> {
-        let first = external_scan_to_evidence(
+        let first_bundle = external_scan_to_evidence(
             "tenant-a",
             "organization/acme",
             1_700_000_000,
@@ -240,7 +240,7 @@ mod tests {
             "mcp@1",
             &report(),
         )?;
-        let second = external_scan_to_evidence(
+        let second_bundle = external_scan_to_evidence(
             "tenant-a",
             "organization/acme",
             1_700_000_600,
@@ -248,18 +248,15 @@ mod tests {
             "mcp@1",
             &report(),
         )?;
-        let first = scanner_finding_fingerprint(&first.observations[1])?
+        let first = scanner_finding_fingerprint(&first_bundle.observations[1])?
             .expect("scanner finding");
-        let second = scanner_finding_fingerprint(&second.observations[1])?
+        let second = scanner_finding_fingerprint(&second_bundle.observations[1])?
             .expect("scanner finding");
         assert_eq!(first.fingerprint, second.fingerprint);
-        assert_ne!(first.observation_id_for_test(), second.observation_id_for_test());
+        assert_ne!(
+            first_bundle.observations[1].external_id,
+            second_bundle.observations[1].external_id
+        );
         Ok(())
-    }
-
-    impl ScannerFindingFingerprint {
-        fn observation_id_for_test(&self) -> &str {
-            &self.fingerprint
-        }
     }
 }
