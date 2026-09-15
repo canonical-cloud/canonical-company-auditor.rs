@@ -31,11 +31,6 @@ const APPROVED_TOOLS: &[&str] = &[
     "powerpipe",
 ];
 
-/// Minimal normalized report emitted by the read-only external-tool runner.
-///
-/// Fields such as command-line arguments and stderr are intentionally omitted from
-/// this boundary. Serde ignores those extra fields, which prevents them from becoming
-/// durable evidence while allowing the transport envelope to evolve independently.
 #[derive(Debug, Deserialize)]
 struct ExternalScanReport {
     tool: String,
@@ -74,6 +69,14 @@ struct ExternalFinding {
     resource: Option<String>,
 }
 
+#[derive(Clone, Copy)]
+struct EvidenceContext<'a> {
+    tenant_id: &'a str,
+    scope_id: &'a str,
+    collected_at: i64,
+    valid_until: i64,
+}
+
 /// Convert one normalized third-party scanner report into a validated evidence bundle.
 ///
 /// The returned observations preserve the scanner identity and normalized facts while
@@ -94,6 +97,38 @@ pub fn external_scan_to_evidence(
     adapter_version: &str,
     report_json: &[u8],
 ) -> Result<EvidenceBundle, AuditError> {
+    let (report, valid_until) = parse_report(report_json, collected_at, valid_for_seconds)?;
+    let context = EvidenceContext {
+        tenant_id,
+        scope_id,
+        collected_at,
+        valid_until,
+    };
+    let source = EvidenceSource::Connector {
+        connector: format!("external.{}", report.tool),
+        adapter_version: adapter_version.to_owned(),
+    };
+    let mut observations = Vec::with_capacity(report.findings.len() + 1);
+    observations.push(run_observation(context, &source, &report)?);
+    for finding in &report.findings {
+        observations.push(finding_observation(context, &source, &report, finding)?);
+    }
+
+    let bundle = EvidenceBundle {
+        schema_version: EVIDENCE_SCHEMA.to_owned(),
+        tenant_id: tenant_id.to_owned(),
+        scope_id: scope_id.to_owned(),
+        observations,
+    };
+    bundle.validate()?;
+    Ok(bundle)
+}
+
+fn parse_report(
+    report_json: &[u8],
+    collected_at: i64,
+    valid_for_seconds: i64,
+) -> Result<(ExternalScanReport, i64), AuditError> {
     if report_json.len() > MAX_REPORT_BYTES {
         return Err(AuditError::Invalid {
             field: "externalScanReport",
@@ -115,8 +150,12 @@ pub fn external_scan_to_evidence(
                 field: "externalScanFreshness",
                 reason: "validUntil overflowed".to_owned(),
             })?;
-
     let report: ExternalScanReport = serde_json::from_slice(report_json)?;
+    validate_report(&report)?;
+    Ok((report, valid_until))
+}
+
+fn validate_report(report: &ExternalScanReport) -> Result<(), AuditError> {
     if !APPROVED_TOOLS.contains(&report.tool.as_str()) {
         return Err(AuditError::Invalid {
             field: "externalScanner",
@@ -154,14 +193,15 @@ pub fn external_scan_to_evidence(
             reason: "provider label is too long".to_owned(),
         });
     }
+    Ok(())
+}
 
-    let source = EvidenceSource::Connector {
-        connector: format!("external.{}", report.tool),
-        adapter_version: adapter_version.to_owned(),
-    };
-
-    let mut observations = Vec::with_capacity(report.findings.len() + 1);
-    let mut run_facts = BTreeMap::from([
+fn run_observation(
+    context: EvidenceContext<'_>,
+    source: &EvidenceSource,
+    report: &ExternalScanReport,
+) -> Result<EvidenceObservation, AuditError> {
+    let mut facts = BTreeMap::from([
         ("tool".to_owned(), json!(report.tool.clone())),
         ("status".to_owned(), json!(report.status.clone())),
         ("readOnly".to_owned(), json!(true)),
@@ -179,79 +219,75 @@ pub fn external_scan_to_evidence(
         ),
     ]);
     if let Some(provider) = report.provider.as_deref() {
-        run_facts.insert("provider".to_owned(), json!(provider));
+        facts.insert("provider".to_owned(), json!(provider));
     }
     if let Some(exit_code) = report.exit_code {
-        run_facts.insert("exitCode".to_owned(), json!(exit_code));
+        facts.insert("exitCode".to_owned(), json!(exit_code));
     }
-    let run_external_id = digest(&(
+    let external_id = digest(&(
         "canonical.external-scanner-run/v1",
-        tenant_id,
-        scope_id,
-        collected_at,
+        context.tenant_id,
+        context.scope_id,
+        context.collected_at,
         &report.tool,
         &report.provider,
         &report.status,
         report.counts.total_records,
     ))?;
-    observations.push(EvidenceObservation {
-        external_id: run_external_id,
+    Ok(EvidenceObservation {
+        external_id,
         evidence_type: "scanner.run".to_owned(),
-        subject: scope_id.to_owned(),
+        subject: context.scope_id.to_owned(),
         source: source.clone(),
-        collected_at,
-        valid_until,
-        facts: run_facts,
+        collected_at: context.collected_at,
+        valid_until: context.valid_until,
+        facts,
         attestation: None,
-    });
+    })
+}
 
-    for finding in report.findings {
-        validate_finding(&finding)?;
-        let finding_external_id = digest(&(
-            "canonical.external-scanner-finding/v1",
-            tenant_id,
-            scope_id,
-            collected_at,
-            &report.tool,
-            &report.provider,
-            &finding.id,
-            &finding.severity,
-            &finding.title,
-            &finding.resource,
-        ))?;
-        let mut facts = BTreeMap::<String, Value>::from([
-            ("tool".to_owned(), json!(report.tool.clone())),
-            ("scannerFindingId".to_owned(), json!(finding.id.clone())),
-            ("severity".to_owned(), json!(finding.severity.clone())),
-            ("title".to_owned(), json!(finding.title.clone())),
-            ("detail".to_owned(), json!(finding.detail.clone())),
-        ]);
-        if let Some(provider) = report.provider.as_deref() {
-            facts.insert("provider".to_owned(), json!(provider));
-        }
-        if let Some(resource) = finding.resource.as_deref() {
-            facts.insert("resource".to_owned(), json!(resource));
-        }
-        observations.push(EvidenceObservation {
-            external_id: finding_external_id,
-            evidence_type: "scanner.finding".to_owned(),
-            subject: scope_id.to_owned(),
-            source: source.clone(),
-            collected_at,
-            valid_until,
-            facts,
-            attestation: None,
-        });
+fn finding_observation(
+    context: EvidenceContext<'_>,
+    source: &EvidenceSource,
+    report: &ExternalScanReport,
+    finding: &ExternalFinding,
+) -> Result<EvidenceObservation, AuditError> {
+    validate_finding(finding)?;
+    let external_id = digest(&(
+        "canonical.external-scanner-finding/v1",
+        context.tenant_id,
+        context.scope_id,
+        context.collected_at,
+        &report.tool,
+        &report.provider,
+        &finding.id,
+        &finding.severity,
+        &finding.title,
+        &finding.resource,
+    ))?;
+    let mut facts = BTreeMap::<String, Value>::from([
+        ("tool".to_owned(), json!(report.tool.clone())),
+        ("scannerFindingId".to_owned(), json!(finding.id.clone())),
+        ("severity".to_owned(), json!(finding.severity.clone())),
+        ("title".to_owned(), json!(finding.title.clone())),
+        ("detail".to_owned(), json!(finding.detail.clone())),
+    ]);
+    if let Some(provider) = report.provider.as_deref() {
+        facts.insert("provider".to_owned(), json!(provider));
     }
-
-    let bundle = EvidenceBundle {
-        schema_version: EVIDENCE_SCHEMA.to_owned(),
-        tenant_id: tenant_id.to_owned(),
-        scope_id: scope_id.to_owned(),
-        observations,
-    };
-    bundle.validate()?;
-    Ok(bundle)
+    if let Some(resource) = finding.resource.as_deref() {
+        facts.insert("resource".to_owned(), json!(resource));
+    }
+    Ok(EvidenceObservation {
+        external_id,
+        evidence_type: "scanner.finding".to_owned(),
+        subject: context.scope_id.to_owned(),
+        source: source.clone(),
+        collected_at: context.collected_at,
+        valid_until: context.valid_until,
+        facts,
+        attestation: None,
+    })
 }
 
 fn validate_finding(finding: &ExternalFinding) -> Result<(), AuditError> {
