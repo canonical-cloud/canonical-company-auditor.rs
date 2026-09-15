@@ -116,7 +116,9 @@ pub fn summarize_scanner_resources(
         group.finding_count += 1;
         group.highest_severity = choose_higher(&group.highest_severity, &severity).to_owned();
         group.unique_fingerprints.insert(fingerprint.fingerprint);
-        group.observation_ids.insert(observation.external_id.clone());
+        group
+            .observation_ids
+            .insert(observation.external_id.clone());
     }
 
     Ok(groups
@@ -249,9 +251,9 @@ mod tests {
             &report(),
         )?;
         let first = scanner_finding_fingerprint(&first_bundle.observations[1])?
-            .expect("scanner finding");
+            .ok_or(AuditError::Integrity)?;
         let second = scanner_finding_fingerprint(&second_bundle.observations[1])?
-            .expect("scanner finding");
+            .ok_or(AuditError::Integrity)?;
         assert_eq!(first.fingerprint, second.fingerprint);
         assert_ne!(
             first_bundle.observations[1].external_id,
