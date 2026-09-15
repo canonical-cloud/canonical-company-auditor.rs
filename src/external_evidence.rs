@@ -108,12 +108,13 @@ pub fn external_scan_to_evidence(
             ),
         });
     }
-    let valid_until = collected_at
-        .checked_add(valid_for_seconds)
-        .ok_or_else(|| AuditError::Invalid {
-            field: "externalScanFreshness",
-            reason: "validUntil overflowed".to_owned(),
-        })?;
+    let valid_until =
+        collected_at
+            .checked_add(valid_for_seconds)
+            .ok_or_else(|| AuditError::Invalid {
+                field: "externalScanFreshness",
+                reason: "validUntil overflowed".to_owned(),
+            })?;
 
     let report: ExternalScanReport = serde_json::from_slice(report_json)?;
     if !APPROVED_TOOLS.contains(&report.tool.as_str()) {
@@ -143,7 +144,11 @@ pub fn external_scan_to_evidence(
             reason: format!("may contain at most {MAX_FINDINGS} normalized findings"),
         });
     }
-    if report.provider.as_deref().is_some_and(|value| value.len() > 160) {
+    if report
+        .provider
+        .as_deref()
+        .is_some_and(|value| value.len() > 160)
+    {
         return Err(AuditError::Invalid {
             field: "externalScannerProvider",
             reason: "provider label is too long".to_owned(),
@@ -168,7 +173,10 @@ pub fn external_scan_to_evidence(
             "informational".to_owned(),
             json!(report.counts.informational),
         ),
-        ("totalRecords".to_owned(), json!(report.counts.total_records)),
+        (
+            "totalRecords".to_owned(),
+            json!(report.counts.total_records),
+        ),
     ]);
     if let Some(provider) = report.provider.as_deref() {
         run_facts.insert("provider".to_owned(), json!(provider));
@@ -305,7 +313,8 @@ mod tests {
     }
 
     #[test]
-    fn converts_normalized_findings_without_persisting_command_metadata() -> Result<(), AuditError> {
+    fn converts_normalized_findings_without_persisting_command_metadata() -> Result<(), AuditError>
+    {
         let input = report(
             true,
             r#"[{"id":"prowler.iam.1","severity":"high","title":"MFA missing","detail":"One principal has no MFA","resource":"arn:aws:iam::123:user/alice"}]"#,
@@ -359,8 +368,11 @@ mod tests {
 
     #[test]
     fn rejects_unapproved_scanner_identity() {
-        let text = String::from_utf8(report(true, "[]")).expect("fixture is utf8");
-        let input = text.replace("\"prowler\"", "\"arbitrary-tool\"").into_bytes();
+        let fixture = report(true, "[]");
+        let text = String::from_utf8_lossy(&fixture);
+        let input = text
+            .replace("\"prowler\"", "\"arbitrary-tool\"")
+            .into_bytes();
         let result = external_scan_to_evidence(
             "tenant-a",
             "organization/acme",
