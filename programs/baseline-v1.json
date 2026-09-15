@@ -33,11 +33,11 @@
     {
       "id": "iso-iec-27001-2022",
       "title": "ISO/IEC 27001 Information Security Management Systems",
-      "version": "2022",
+      "version": "2022 + Amd 1:2024",
       "authority": "ISO and IEC",
-      "sourceUrl": "https://www.iso.org/standard/82875.html",
+      "sourceUrl": "https://www.iso.org/standard/27001",
       "redistribution": "reference-only; no ISO control text embedded",
-      "statusNote": "Certification requires an accredited certification body."
+      "statusNote": "Profile metadata includes the published ISO/IEC 27001:2022/Amd 1:2024 amendment; certification requires an accredited certification body."
     },
     {
       "id": "nist-800-53-r5",

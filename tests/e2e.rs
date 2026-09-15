@@ -97,3 +97,28 @@ fn cross_tenant_and_lookalike_scopes_fail_closed() -> Result<(), Box<dyn Error>>
     ));
     Ok(())
 }
+
+#[test]
+fn iso_profile_tracks_published_2024_amendment() -> Result<(), Box<dyn Error>> {
+    let program: serde_json::Value =
+        serde_json::from_str(include_str!("../programs/baseline-v1.json"))?;
+    let frameworks = program["frameworks"]
+        .as_array()
+        .ok_or("frameworks must be an array")?;
+    let iso = frameworks
+        .iter()
+        .find(|framework| framework["id"].as_str() == Some("iso-iec-27001-2022"))
+        .ok_or("ISO/IEC 27001 profile missing")?;
+
+    assert_eq!(iso["version"].as_str(), Some("2022 + Amd 1:2024"));
+    assert_eq!(
+        iso["sourceUrl"].as_str(),
+        Some("https://www.iso.org/standard/27001")
+    );
+    assert!(
+        iso["statusNote"]
+            .as_str()
+            .is_some_and(|note| note.contains("ISO/IEC 27001:2022/Amd 1:2024"))
+    );
+    Ok(())
+}
