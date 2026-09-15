@@ -66,6 +66,14 @@ struct NativeFinding {
     resource: Option<String>,
 }
 
+#[derive(Clone, Copy)]
+struct EvidenceContext<'a> {
+    tenant_id: &'a str,
+    scope_id: &'a str,
+    collected_at: i64,
+    valid_until: i64,
+}
+
 /// Convert a Canonical native account-readiness report into framework-neutral evidence.
 ///
 /// The caller supplies the authoritative audit tenant/scope and collection timestamp. A
@@ -84,6 +92,41 @@ pub fn native_readiness_to_evidence(
     adapter_version: &str,
     report_json: &[u8],
 ) -> Result<EvidenceBundle, AuditError> {
+    let (report, valid_until) = parse_report(report_json, collected_at, valid_for_seconds)?;
+    let context = EvidenceContext {
+        tenant_id,
+        scope_id,
+        collected_at,
+        valid_until,
+    };
+    let source = EvidenceSource::Connector {
+        connector: format!("canonical-readiness.{}", report.provider),
+        adapter_version: adapter_version.to_owned(),
+    };
+    let mut observations = Vec::with_capacity(1 + report.checks.len() + report.findings.len());
+    observations.push(run_observation(context, &source, &report)?);
+    for check in &report.checks {
+        observations.push(check_observation(context, &source, &report, check)?);
+    }
+    for finding in &report.findings {
+        observations.push(finding_observation(context, &source, &report, finding)?);
+    }
+
+    let bundle = EvidenceBundle {
+        schema_version: EVIDENCE_SCHEMA.to_owned(),
+        tenant_id: tenant_id.to_owned(),
+        scope_id: scope_id.to_owned(),
+        observations,
+    };
+    bundle.validate()?;
+    Ok(bundle)
+}
+
+fn parse_report(
+    report_json: &[u8],
+    collected_at: i64,
+    valid_for_seconds: i64,
+) -> Result<(NativeScanReport, i64), AuditError> {
     if report_json.len() > MAX_REPORT_BYTES {
         return Err(AuditError::Invalid {
             field: "nativeReadinessReport",
@@ -105,8 +148,12 @@ pub fn native_readiness_to_evidence(
                 field: "nativeReadinessFreshness",
                 reason: "validUntil overflowed".to_owned(),
             })?;
-
     let report: NativeScanReport = serde_json::from_slice(report_json)?;
+    validate_report(&report)?;
+    Ok((report, valid_until))
+}
+
+fn validate_report(report: &NativeScanReport) -> Result<(), AuditError> {
     if !PROVIDERS.contains(&report.provider.as_str()) {
         return Err(AuditError::Invalid {
             field: "nativeReadinessProvider",
@@ -129,117 +176,119 @@ pub fn native_readiness_to_evidence(
             reason: "provider scope must be bounded printable text".to_owned(),
         });
     }
+    Ok(())
+}
 
-    let source = EvidenceSource::Connector {
-        connector: format!("canonical-readiness.{}", report.provider),
-        adapter_version: adapter_version.to_owned(),
-    };
-    let mut observations = Vec::with_capacity(1 + report.checks.len() + report.findings.len());
-
-    let mut run_facts = BTreeMap::from([
+fn run_observation(
+    context: EvidenceContext<'_>,
+    source: &EvidenceSource,
+    report: &NativeScanReport,
+) -> Result<EvidenceObservation, AuditError> {
+    let mut facts = BTreeMap::from([
         ("provider".to_owned(), json!(report.provider.clone())),
         ("transport".to_owned(), json!(report.transport.clone())),
         ("authStatus".to_owned(), json!(report.auth_status.clone())),
         ("scannerScore".to_owned(), json!(report.score)),
     ]);
     if let Some(provider_scope) = report.scope.as_deref() {
-        run_facts.insert("providerScope".to_owned(), json!(provider_scope));
+        facts.insert("providerScope".to_owned(), json!(provider_scope));
     }
-    let run_external_id = digest(&(
+    let external_id = digest(&(
         "canonical.native-readiness-run/v1",
-        tenant_id,
-        scope_id,
-        collected_at,
+        context.tenant_id,
+        context.scope_id,
+        context.collected_at,
         &report.provider,
         &report.scope,
         &report.transport,
     ))?;
-    observations.push(EvidenceObservation {
-        external_id: run_external_id,
+    Ok(EvidenceObservation {
+        external_id,
         evidence_type: "readiness.run".to_owned(),
-        subject: scope_id.to_owned(),
+        subject: context.scope_id.to_owned(),
         source: source.clone(),
-        collected_at,
-        valid_until,
-        facts: run_facts,
+        collected_at: context.collected_at,
+        valid_until: context.valid_until,
+        facts,
         attestation: None,
-    });
+    })
+}
 
-    for check in report.checks {
-        validate_text("nativeReadinessCheck", &check.check)?;
-        validate_text("nativeReadinessCheckStatus", &check.status)?;
-        validate_text("nativeReadinessCheckSummary", &check.summary)?;
-        let external_id = digest(&(
-            "canonical.native-readiness-check/v1",
-            tenant_id,
-            scope_id,
-            collected_at,
-            &report.provider,
-            &check.check,
-            &check.status,
-            &check.summary,
-        ))?;
-        observations.push(EvidenceObservation {
-            external_id,
-            evidence_type: "readiness.check".to_owned(),
-            subject: scope_id.to_owned(),
-            source: source.clone(),
-            collected_at,
-            valid_until,
-            facts: BTreeMap::<String, Value>::from([
-                ("provider".to_owned(), json!(report.provider.clone())),
-                ("check".to_owned(), json!(check.check)),
-                ("status".to_owned(), json!(check.status)),
-                ("summary".to_owned(), json!(check.summary)),
-            ]),
-            attestation: None,
-        });
-    }
-
-    for finding in report.findings {
-        validate_finding(&finding)?;
-        let external_id = digest(&(
-            "canonical.native-readiness-finding/v1",
-            tenant_id,
-            scope_id,
-            collected_at,
-            &report.provider,
-            &finding.id,
-            &finding.severity,
-            &finding.category,
-            &finding.resource,
-        ))?;
-        let mut facts = BTreeMap::<String, Value>::from([
+fn check_observation(
+    context: EvidenceContext<'_>,
+    source: &EvidenceSource,
+    report: &NativeScanReport,
+    check: &NativeCheck,
+) -> Result<EvidenceObservation, AuditError> {
+    validate_text("nativeReadinessCheck", &check.check)?;
+    validate_text("nativeReadinessCheckStatus", &check.status)?;
+    validate_text("nativeReadinessCheckSummary", &check.summary)?;
+    let external_id = digest(&(
+        "canonical.native-readiness-check/v1",
+        context.tenant_id,
+        context.scope_id,
+        context.collected_at,
+        &report.provider,
+        &check.check,
+        &check.status,
+        &check.summary,
+    ))?;
+    Ok(EvidenceObservation {
+        external_id,
+        evidence_type: "readiness.check".to_owned(),
+        subject: context.scope_id.to_owned(),
+        source: source.clone(),
+        collected_at: context.collected_at,
+        valid_until: context.valid_until,
+        facts: BTreeMap::<String, Value>::from([
             ("provider".to_owned(), json!(report.provider.clone())),
-            ("scannerFindingId".to_owned(), json!(finding.id)),
-            ("severity".to_owned(), json!(finding.severity)),
-            ("category".to_owned(), json!(finding.category)),
-            ("title".to_owned(), json!(finding.title)),
-            ("detail".to_owned(), json!(finding.detail)),
-        ]);
-        if let Some(resource) = finding.resource {
-            facts.insert("resource".to_owned(), json!(resource));
-        }
-        observations.push(EvidenceObservation {
-            external_id,
-            evidence_type: "readiness.finding".to_owned(),
-            subject: scope_id.to_owned(),
-            source: source.clone(),
-            collected_at,
-            valid_until,
-            facts,
-            attestation: None,
-        });
-    }
+            ("check".to_owned(), json!(check.check.clone())),
+            ("status".to_owned(), json!(check.status.clone())),
+            ("summary".to_owned(), json!(check.summary.clone())),
+        ]),
+        attestation: None,
+    })
+}
 
-    let bundle = EvidenceBundle {
-        schema_version: EVIDENCE_SCHEMA.to_owned(),
-        tenant_id: tenant_id.to_owned(),
-        scope_id: scope_id.to_owned(),
-        observations,
-    };
-    bundle.validate()?;
-    Ok(bundle)
+fn finding_observation(
+    context: EvidenceContext<'_>,
+    source: &EvidenceSource,
+    report: &NativeScanReport,
+    finding: &NativeFinding,
+) -> Result<EvidenceObservation, AuditError> {
+    validate_finding(finding)?;
+    let external_id = digest(&(
+        "canonical.native-readiness-finding/v1",
+        context.tenant_id,
+        context.scope_id,
+        context.collected_at,
+        &report.provider,
+        &finding.id,
+        &finding.severity,
+        &finding.category,
+        &finding.resource,
+    ))?;
+    let mut facts = BTreeMap::<String, Value>::from([
+        ("provider".to_owned(), json!(report.provider.clone())),
+        ("scannerFindingId".to_owned(), json!(finding.id.clone())),
+        ("severity".to_owned(), json!(finding.severity.clone())),
+        ("category".to_owned(), json!(finding.category.clone())),
+        ("title".to_owned(), json!(finding.title.clone())),
+        ("detail".to_owned(), json!(finding.detail.clone())),
+    ]);
+    if let Some(resource) = finding.resource.as_deref() {
+        facts.insert("resource".to_owned(), json!(resource));
+    }
+    Ok(EvidenceObservation {
+        external_id,
+        evidence_type: "readiness.finding".to_owned(),
+        subject: context.scope_id.to_owned(),
+        source: source.clone(),
+        collected_at: context.collected_at,
+        valid_until: context.valid_until,
+        facts,
+        attestation: None,
+    })
 }
 
 fn validate_transport(value: &str) -> Result<(), AuditError> {
@@ -293,15 +342,8 @@ fn validate_finding(finding: &NativeFinding) -> Result<(), AuditError> {
             reason: "must be critical, high, medium, low, or info".to_owned(),
         });
     }
-    if finding
-        .resource
-        .as_deref()
-        .is_some_and(|value| validate_text("nativeReadinessFindingResource", value).is_err())
-    {
-        return Err(AuditError::Invalid {
-            field: "nativeReadinessFindingResource",
-            reason: "resource must be bounded printable text".to_owned(),
-        });
+    if let Some(resource) = finding.resource.as_deref() {
+        validate_text("nativeReadinessFindingResource", resource)?;
     }
     Ok(())
 }
