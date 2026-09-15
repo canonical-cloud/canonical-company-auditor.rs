@@ -15,6 +15,7 @@ pub mod model;
 pub mod package;
 pub mod program;
 pub mod report;
+pub mod scanner_signals;
 pub mod server;
 
 use thiserror::Error;
