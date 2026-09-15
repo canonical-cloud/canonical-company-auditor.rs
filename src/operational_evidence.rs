@@ -1,6 +1,6 @@
 //! Framework-neutral evidence normalization for operational readiness reports.
 //!
-//! Prometheus and OpenCost provide runtime and cost-allocation observations that complement
+//! Prometheus and `OpenCost` provide runtime and cost-allocation observations that complement
 //! provider inventory scans. Their scanner-authored recommendations and free-form notes are
 //! intentionally excluded from durable audit evidence; deterministic Canonical rules decide
 //! later whether any observed signal maps to a framework control.
@@ -33,9 +33,12 @@ struct OperationalReport {
 
 #[derive(Debug, Deserialize)]
 struct Thresholds {
-    cpu_high_percent: f64,
-    disk_free_low_percent: f64,
-    memory_free_low_percent: f64,
+    #[serde(rename = "cpu_high_percent")]
+    cpu_high: f64,
+    #[serde(rename = "disk_free_low_percent")]
+    disk_free_low: f64,
+    #[serde(rename = "memory_free_low_percent")]
+    memory_free_low: f64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -57,7 +60,15 @@ struct OperationalFinding {
     resource: Option<String>,
 }
 
-/// Convert one read-only Prometheus/OpenCost operational report into evidence.
+#[derive(Clone, Copy)]
+struct EvidenceContext<'a> {
+    tenant_id: &'a str,
+    scope_id: &'a str,
+    collected_at: i64,
+    valid_until: i64,
+}
+
+/// Convert one read-only Prometheus/`OpenCost` operational report into evidence.
 ///
 /// The source report may contain scanner notes and remediation recommendations, but this
 /// adapter's narrow deserialization surface drops them. The resulting observations preserve
@@ -75,6 +86,41 @@ pub fn operational_readiness_to_evidence(
     adapter_version: &str,
     report_json: &[u8],
 ) -> Result<EvidenceBundle, AuditError> {
+    let (report, valid_until) = parse_report(report_json, collected_at, valid_for_seconds)?;
+    let context = EvidenceContext {
+        tenant_id,
+        scope_id,
+        collected_at,
+        valid_until,
+    };
+    let source = EvidenceSource::Connector {
+        connector: "canonical-operational-readiness".to_owned(),
+        adapter_version: adapter_version.to_owned(),
+    };
+    let mut observations = Vec::with_capacity(1 + report.evidence.len() + report.findings.len());
+    observations.push(run_observation(context, &source, &report)?);
+    for evidence in &report.evidence {
+        observations.push(check_observation(context, &source, evidence)?);
+    }
+    for finding in &report.findings {
+        observations.push(finding_observation(context, &source, finding)?);
+    }
+
+    let bundle = EvidenceBundle {
+        schema_version: EVIDENCE_SCHEMA.to_owned(),
+        tenant_id: tenant_id.to_owned(),
+        scope_id: scope_id.to_owned(),
+        observations,
+    };
+    bundle.validate()?;
+    Ok(bundle)
+}
+
+fn parse_report(
+    report_json: &[u8],
+    collected_at: i64,
+    valid_for_seconds: i64,
+) -> Result<(OperationalReport, i64), AuditError> {
     if report_json.len() > MAX_REPORT_BYTES {
         return Err(AuditError::Invalid {
             field: "operationalReadinessReport",
@@ -96,8 +142,12 @@ pub fn operational_readiness_to_evidence(
                 field: "operationalReadinessFreshness",
                 reason: "validUntil overflowed".to_owned(),
             })?;
-
     let report: OperationalReport = serde_json::from_slice(report_json)?;
+    validate_report(&report)?;
+    Ok((report, valid_until))
+}
+
+fn validate_report(report: &OperationalReport) -> Result<(), AuditError> {
     validate_text("prometheusStatus", &report.prometheus)?;
     validate_text("openCostStatus", &report.opencost)?;
     validate_thresholds(&report.thresholds)?;
@@ -107,127 +157,125 @@ pub fn operational_readiness_to_evidence(
             reason: "report contains too many evidence rows or findings".to_owned(),
         });
     }
+    Ok(())
+}
 
-    let source = EvidenceSource::Connector {
-        connector: "canonical-operational-readiness".to_owned(),
-        adapter_version: adapter_version.to_owned(),
-    };
-    let mut observations = Vec::with_capacity(1 + report.evidence.len() + report.findings.len());
-    let run_external_id = digest(&(
+fn run_observation(
+    context: EvidenceContext<'_>,
+    source: &EvidenceSource,
+    report: &OperationalReport,
+) -> Result<EvidenceObservation, AuditError> {
+    let external_id = digest(&(
         "canonical.operational-readiness-run/v1",
-        tenant_id,
-        scope_id,
-        collected_at,
+        context.tenant_id,
+        context.scope_id,
+        context.collected_at,
         &report.prometheus,
         &report.opencost,
-        report.thresholds.cpu_high_percent.to_bits(),
-        report.thresholds.disk_free_low_percent.to_bits(),
-        report.thresholds.memory_free_low_percent.to_bits(),
+        report.thresholds.cpu_high.to_bits(),
+        report.thresholds.disk_free_low.to_bits(),
+        report.thresholds.memory_free_low.to_bits(),
     ))?;
-    observations.push(EvidenceObservation {
-        external_id: run_external_id,
+    Ok(EvidenceObservation {
+        external_id,
         evidence_type: "operations.readiness_run".to_owned(),
-        subject: scope_id.to_owned(),
+        subject: context.scope_id.to_owned(),
         source: source.clone(),
-        collected_at,
-        valid_until,
+        collected_at: context.collected_at,
+        valid_until: context.valid_until,
         facts: BTreeMap::<String, Value>::from([
             ("prometheusStatus".to_owned(), json!(report.prometheus)),
             ("openCostStatus".to_owned(), json!(report.opencost)),
-            (
-                "cpuHighPercent".to_owned(),
-                json!(report.thresholds.cpu_high_percent),
-            ),
+            ("cpuHighPercent".to_owned(), json!(report.thresholds.cpu_high)),
             (
                 "diskFreeLowPercent".to_owned(),
-                json!(report.thresholds.disk_free_low_percent),
+                json!(report.thresholds.disk_free_low),
             ),
             (
                 "memoryFreeLowPercent".to_owned(),
-                json!(report.thresholds.memory_free_low_percent),
+                json!(report.thresholds.memory_free_low),
             ),
         ]),
         attestation: None,
-    });
+    })
+}
 
-    for evidence in report.evidence {
-        validate_operational_evidence(&evidence)?;
-        let external_id = digest(&(
-            "canonical.operational-readiness-evidence/v1",
-            tenant_id,
-            scope_id,
-            collected_at,
-            &evidence.source,
-            &evidence.check,
-            &evidence.status,
-            &evidence.summary,
-        ))?;
-        observations.push(EvidenceObservation {
-            external_id,
-            evidence_type: "operations.check".to_owned(),
-            subject: scope_id.to_owned(),
-            source: source.clone(),
-            collected_at,
-            valid_until,
-            facts: BTreeMap::<String, Value>::from([
-                ("source".to_owned(), json!(evidence.source)),
-                ("check".to_owned(), json!(evidence.check)),
-                ("status".to_owned(), json!(evidence.status)),
-                ("summary".to_owned(), json!(evidence.summary)),
-            ]),
-            attestation: None,
-        });
+fn check_observation(
+    context: EvidenceContext<'_>,
+    source: &EvidenceSource,
+    evidence: &OperationalEvidence,
+) -> Result<EvidenceObservation, AuditError> {
+    validate_operational_evidence(evidence)?;
+    let external_id = digest(&(
+        "canonical.operational-readiness-evidence/v1",
+        context.tenant_id,
+        context.scope_id,
+        context.collected_at,
+        &evidence.source,
+        &evidence.check,
+        &evidence.status,
+        &evidence.summary,
+    ))?;
+    Ok(EvidenceObservation {
+        external_id,
+        evidence_type: "operations.check".to_owned(),
+        subject: context.scope_id.to_owned(),
+        source: source.clone(),
+        collected_at: context.collected_at,
+        valid_until: context.valid_until,
+        facts: BTreeMap::<String, Value>::from([
+            ("source".to_owned(), json!(evidence.source.clone())),
+            ("check".to_owned(), json!(evidence.check.clone())),
+            ("status".to_owned(), json!(evidence.status.clone())),
+            ("summary".to_owned(), json!(evidence.summary.clone())),
+        ]),
+        attestation: None,
+    })
+}
+
+fn finding_observation(
+    context: EvidenceContext<'_>,
+    source: &EvidenceSource,
+    finding: &OperationalFinding,
+) -> Result<EvidenceObservation, AuditError> {
+    validate_operational_finding(finding)?;
+    let external_id = digest(&(
+        "canonical.operational-readiness-finding/v1",
+        context.tenant_id,
+        context.scope_id,
+        context.collected_at,
+        &finding.id,
+        &finding.severity,
+        &finding.category,
+        &finding.resource,
+    ))?;
+    let mut facts = BTreeMap::<String, Value>::from([
+        ("scannerFindingId".to_owned(), json!(finding.id.clone())),
+        ("severity".to_owned(), json!(finding.severity.clone())),
+        ("category".to_owned(), json!(finding.category.clone())),
+        ("title".to_owned(), json!(finding.title.clone())),
+        ("detail".to_owned(), json!(finding.detail.clone())),
+    ]);
+    if let Some(resource) = finding.resource.as_deref() {
+        facts.insert("resource".to_owned(), json!(resource));
     }
-
-    for finding in report.findings {
-        validate_operational_finding(&finding)?;
-        let external_id = digest(&(
-            "canonical.operational-readiness-finding/v1",
-            tenant_id,
-            scope_id,
-            collected_at,
-            &finding.id,
-            &finding.severity,
-            &finding.category,
-            &finding.resource,
-        ))?;
-        let mut facts = BTreeMap::<String, Value>::from([
-            ("scannerFindingId".to_owned(), json!(finding.id)),
-            ("severity".to_owned(), json!(finding.severity)),
-            ("category".to_owned(), json!(finding.category)),
-            ("title".to_owned(), json!(finding.title)),
-            ("detail".to_owned(), json!(finding.detail)),
-        ]);
-        if let Some(resource) = finding.resource {
-            facts.insert("resource".to_owned(), json!(resource));
-        }
-        observations.push(EvidenceObservation {
-            external_id,
-            evidence_type: "operations.finding".to_owned(),
-            subject: scope_id.to_owned(),
-            source: source.clone(),
-            collected_at,
-            valid_until,
-            facts,
-            attestation: None,
-        });
-    }
-
-    let bundle = EvidenceBundle {
-        schema_version: EVIDENCE_SCHEMA.to_owned(),
-        tenant_id: tenant_id.to_owned(),
-        scope_id: scope_id.to_owned(),
-        observations,
-    };
-    bundle.validate()?;
-    Ok(bundle)
+    Ok(EvidenceObservation {
+        external_id,
+        evidence_type: "operations.finding".to_owned(),
+        subject: context.scope_id.to_owned(),
+        source: source.clone(),
+        collected_at: context.collected_at,
+        valid_until: context.valid_until,
+        facts,
+        attestation: None,
+    })
 }
 
 fn validate_thresholds(thresholds: &Thresholds) -> Result<(), AuditError> {
     for (field, value) in [
-        ("cpuHighPercent", thresholds.cpu_high_percent),
-        ("diskFreeLowPercent", thresholds.disk_free_low_percent),
-        ("memoryFreeLowPercent", thresholds.memory_free_low_percent),
+        ("cpuHighPercent", thresholds.cpu_high),
+        ("diskFreeLowPercent", thresholds.disk_free_low),
+        ("memoryFreeLowPercent", thresholds.memory_free_low),
     ] {
         if !value.is_finite() || !(0.0..=100.0).contains(&value) {
             return Err(AuditError::Invalid {
