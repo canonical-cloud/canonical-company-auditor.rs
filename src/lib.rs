@@ -14,6 +14,7 @@ pub mod external_evidence;
 pub mod flags;
 pub mod model;
 pub mod native_readiness_evidence;
+pub mod operational_evidence;
 pub mod package;
 pub mod program;
 pub mod report;
