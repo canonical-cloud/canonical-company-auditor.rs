@@ -115,7 +115,8 @@ fn config(arguments: &ConfigArgs) -> Result<Exit, AuditError> {
 
     if valid {
         Ok(Exit::Success)
-    } else if mode == InteractionMode::NonInteractive && config.interaction.fail_on_missing_required {
+    } else if mode == InteractionMode::NonInteractive && config.interaction.fail_on_missing_required
+    {
         Ok(Exit::FindingThreshold)
     } else if prompt_required && config.interaction.prompt_for_missing {
         Ok(Exit::FindingThreshold)
