@@ -1,0 +1,44 @@
+name: format current PR once
+
+on:
+  push:
+    branches:
+      - feat/canonical-cfg-runtime-admission
+    paths:
+      - .github/workflows/format-current-pr.yml
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: feat/canonical-cfg-runtime-admission
+          persist-credentials: true
+      - uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30
+        with:
+          toolchain: "1.95.0"
+          components: rustfmt
+      - name: Format and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo fmt --all
+          rm .github/workflows/format-current-pr.yml
+          git diff --check
+          changed=$(git diff --name-only | sort)
+          expected=$(printf '%s\n' '.github/workflows/format-current-pr.yml' 'src/audit_config.rs' | sort)
+          test "$changed" = "$expected"
+      - name: Commit exact formatting repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'ORESoftware automation'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/audit_config.rs .github/workflows/format-current-pr.yml
+          git commit -m 'style: apply rustfmt to canonical config admission'
+          git push origin HEAD:feat/canonical-cfg-runtime-admission
