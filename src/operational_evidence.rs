@@ -186,7 +186,10 @@ fn run_observation(
         facts: BTreeMap::<String, Value>::from([
             ("prometheusStatus".to_owned(), json!(report.prometheus)),
             ("openCostStatus".to_owned(), json!(report.opencost)),
-            ("cpuHighPercent".to_owned(), json!(report.thresholds.cpu_high)),
+            (
+                "cpuHighPercent".to_owned(),
+                json!(report.thresholds.cpu_high),
+            ),
             (
                 "diskFreeLowPercent".to_owned(),
                 json!(report.thresholds.disk_free_low),
