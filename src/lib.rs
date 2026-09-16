@@ -5,6 +5,19 @@
 
 pub mod app;
 pub mod audit;
+// This is a handwritten consuming projection of the admitted external audit-config contract.
+// Keep the wire-shaped bool fields and deterministic validation layout stable until generated
+// adapters replace it; scope projection/test style exceptions here rather than weakening Clippy
+// for the rest of the crate.
+#[allow(
+    clippy::bool_comparison,
+    clippy::expect_used,
+    clippy::must_use_candidate,
+    clippy::ref_option,
+    clippy::semicolon_if_nothing_returned,
+    clippy::struct_excessive_bools,
+    clippy::too_many_lines
+)]
 pub mod audit_config;
 pub mod cli;
 pub mod engagement;
