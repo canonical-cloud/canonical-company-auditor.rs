@@ -5,6 +5,7 @@
 
 pub mod app;
 pub mod audit;
+pub mod audit_config;
 pub mod cli;
 pub mod engagement;
 pub mod engine;
@@ -49,6 +50,9 @@ pub enum AuditError {
     /// JSON serialization or parsing failed.
     #[error("JSON boundary error: {0}")]
     Json(#[from] serde_json::Error),
+    /// TOML parsing failed at the audit-config boundary.
+    #[error("TOML boundary error: {0}")]
+    Toml(#[from] toml::de::Error),
     /// Filesystem or socket I/O failed.
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
