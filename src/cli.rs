@@ -16,6 +16,8 @@ pub struct Cli {
 /// Supported top-level operations.
 #[derive(Clone, Debug, Subcommand)]
 pub enum Command {
+    /// Validate/show the authoritative `.canonical-cfg.toml` consumer projection.
+    Config(ConfigArgs),
     /// Export or assess an independently scoped customer readiness questionnaire.
     Readiness(ReadinessArgs),
     /// Inspect reviewed framework metadata and deterministic rule coverage.
@@ -32,6 +34,35 @@ pub enum Command {
     Prompt(PromptArgs),
     /// Run the signed inbound assessment/webhook HTTP service.
     Serve(ServeArgs),
+}
+
+/// Audit-config validation and safe display settings.
+#[derive(Clone, Debug, Args)]
+pub struct ConfigArgs {
+    /// Canonical audit config path.
+    #[arg(
+        long,
+        default_value = ".canonical-cfg.toml",
+        env = "CANONICAL_AUDITOR_CONFIG_FILE"
+    )]
+    pub file: PathBuf,
+    /// Emit a redacted config projection after validation.
+    #[arg(long, env = "CANONICAL_AUDITOR_CONFIG_SHOW")]
+    pub show: bool,
+    /// Explicitly permit interactive missing-input handling by a caller.
+    #[arg(
+        long,
+        conflicts_with = "non_interactive",
+        env = "CANONICAL_AUDITOR_CONFIG_INTERACTIVE"
+    )]
+    pub interactive: bool,
+    /// Fail closed with a structured missing-field list and never prompt.
+    #[arg(
+        long,
+        conflicts_with = "interactive",
+        env = "CANONICAL_AUDITOR_CONFIG_NON_INTERACTIVE"
+    )]
+    pub non_interactive: bool,
 }
 
 /// Catalog output settings.

@@ -11,9 +11,10 @@ use serde_json::json;
 
 use crate::AuditError;
 use crate::audit::{AuditDossier, ControlTestStatus, run_audit};
+use crate::audit_config::{CanonicalAuditConfig, InteractionMode};
 use crate::cli::{
-    AssessArgs, AuditArgs, CatalogArgs, CatalogFormat, Cli, Command, PackageArgs, PromptArgs,
-    ReportFormat, ServeArgs, ValidateArgs,
+    AssessArgs, AuditArgs, CatalogArgs, CatalogFormat, Cli, Command, ConfigArgs, PackageArgs,
+    PromptArgs, ReportFormat, ServeArgs, ValidateArgs,
 };
 use crate::engagement::AuditEngagement;
 use crate::engine::{assess, verify_report};
@@ -49,6 +50,7 @@ pub enum Exit {
 /// fails.
 pub async fn execute(cli: Cli) -> Result<Exit, AuditError> {
     match cli.command {
+        Command::Config(arguments) => config(&arguments),
         Command::Readiness(arguments) => readiness::execute(&arguments),
         Command::Catalog(arguments) => catalog(&arguments),
         Command::Validate(arguments) => validate(&arguments),
@@ -58,6 +60,64 @@ pub async fn execute(cli: Cli) -> Result<Exit, AuditError> {
         Command::Prompt(arguments) => prompt(&arguments),
         Command::Serve(arguments) => serve(arguments).await,
     }
+}
+
+fn config(arguments: &ConfigArgs) -> Result<Exit, AuditError> {
+    let config = CanonicalAuditConfig::load(&arguments.file)?;
+    let mode = if arguments.interactive {
+        if !config.interaction.allow_interactive_override {
+            return Err(AuditError::Invalid {
+                field: "canonical-cfg",
+                reason: "interactive override is disabled by the manifest".to_owned(),
+            });
+        }
+        InteractionMode::Interactive
+    } else if arguments.non_interactive {
+        if !config.interaction.allow_interactive_override {
+            return Err(AuditError::Invalid {
+                field: "canonical-cfg",
+                reason: "non-interactive override is disabled by the manifest".to_owned(),
+            });
+        }
+        InteractionMode::NonInteractive
+    } else {
+        config.interaction.default_mode
+    };
+
+    let missing = config.missing_required_fields();
+    let digest = config.redacted_digest()?;
+    let valid = missing.is_empty();
+    let prompt_required = !valid && mode == InteractionMode::Interactive;
+    let redacted = if arguments.show {
+        Some(config.redacted_json()?)
+    } else {
+        None
+    };
+    let output = serde_json::to_string_pretty(&json!({
+        "schemaVersion": config.schema_version,
+        "customerId": config.customer_id,
+        "valid": valid,
+        "interactionMode": match mode {
+            InteractionMode::Interactive => "interactive",
+            InteractionMode::NonInteractive => "non-interactive",
+        },
+        "promptRequired": prompt_required,
+        "missingRequiredFields": missing,
+        "redactedConfigSha256": digest,
+        "config": redacted,
+        "authority": {
+            "repository": "canonical-cloud/canonical-interfaces",
+            "contract": "contracts/canonical-audit-config/v1",
+            "precedence": "none"
+        }
+    }))?;
+    write_output("-", &format!("{output}\n"))?;
+
+    Ok(if valid {
+        Exit::Success
+    } else {
+        Exit::FindingThreshold
+    })
 }
 
 fn catalog(arguments: &CatalogArgs) -> Result<Exit, AuditError> {
