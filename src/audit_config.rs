@@ -420,7 +420,8 @@ impl CanonicalAuditConfig {
         if u64::try_from(bytes.len()).unwrap_or(u64::MAX) > MAX_CONFIG_BYTES {
             return Err(invalid("configuration exceeds 1 MiB"));
         }
-        let text = std::str::from_utf8(&bytes).map_err(|_| invalid("configuration is not UTF-8"))?;
+        let text =
+            std::str::from_utf8(&bytes).map_err(|_| invalid("configuration is not UTF-8"))?;
         let config: Self = toml::from_str(text)?;
         config.validate()?;
         Ok(config)
@@ -433,40 +434,117 @@ impl CanonicalAuditConfig {
     /// Fails closed when an audit configuration could mutate customer state, expose secrets,
     /// or publish outside the customer allowlist.
     pub fn validate(&self) -> Result<(), AuditError> {
-        require(self.schema_version == SCHEMA_VERSION, "schema_version must be canonical.audit-config.v1")?;
-        require(!self.customer_id.trim().is_empty(), "customer_id must not be empty")?;
-        require(!self.display_name.trim().is_empty(), "display_name must not be empty")?;
-        require(self.audit_mode == "read-only", "audit_mode must be read-only")?;
-        require(!self.security.allow_mutations, "security.allow_mutations must be false")?;
-        require(!self.security.allow_plaintext_secrets, "security.allow_plaintext_secrets must be false")?;
-        require(!self.security.secret_reference_schemes.is_empty(), "security.secret_reference_schemes must not be empty")?;
+        require(
+            self.schema_version == SCHEMA_VERSION,
+            "schema_version must be canonical.audit-config.v1",
+        )?;
+        require(
+            !self.customer_id.trim().is_empty(),
+            "customer_id must not be empty",
+        )?;
+        require(
+            !self.display_name.trim().is_empty(),
+            "display_name must not be empty",
+        )?;
+        require(
+            self.audit_mode == "read-only",
+            "audit_mode must be read-only",
+        )?;
+        require(
+            !self.security.allow_mutations,
+            "security.allow_mutations must be false",
+        )?;
+        require(
+            !self.security.allow_plaintext_secrets,
+            "security.allow_plaintext_secrets must be false",
+        )?;
+        require(
+            !self.security.secret_reference_schemes.is_empty(),
+            "security.secret_reference_schemes must not be empty",
+        )?;
         require(self.repository.private, "repository.private must be true")?;
-        require(self.repository.evidence_dir == "evidence", "repository.evidence_dir must be evidence")?;
-        require(self.repository.workpapers_dir == "workpapers", "repository.workpapers_dir must be workpapers")?;
-        require(self.repository.reports_dir == "reports", "repository.reports_dir must be reports")?;
-        require(self.repository.manifests_dir == "manifests", "repository.manifests_dir must be manifests")?;
-        require(self.repository.customer_dir == CUSTOMER_DIR, "repository.customer_dir must be customer")?;
-        require(self.publishing.source_dir == CUSTOMER_DIR, "publishing.source_dir must be customer")?;
-        require(self.git.commit_raw_secrets == false, "git.commit_raw_secrets must be false")?;
-        require(self.evidence.hash == "sha256", "evidence.hash must be sha256")?;
+        require(
+            self.repository.evidence_dir == "evidence",
+            "repository.evidence_dir must be evidence",
+        )?;
+        require(
+            self.repository.workpapers_dir == "workpapers",
+            "repository.workpapers_dir must be workpapers",
+        )?;
+        require(
+            self.repository.reports_dir == "reports",
+            "repository.reports_dir must be reports",
+        )?;
+        require(
+            self.repository.manifests_dir == "manifests",
+            "repository.manifests_dir must be manifests",
+        )?;
+        require(
+            self.repository.customer_dir == CUSTOMER_DIR,
+            "repository.customer_dir must be customer",
+        )?;
+        require(
+            self.publishing.source_dir == CUSTOMER_DIR,
+            "publishing.source_dir must be customer",
+        )?;
+        require(
+            self.git.commit_raw_secrets == false,
+            "git.commit_raw_secrets must be false",
+        )?;
+        require(
+            self.evidence.hash == "sha256",
+            "evidence.hash must be sha256",
+        )?;
 
         if self.publishing.enabled {
-            require(self.publishing.provider == PublishingProvider::CloudflareR2, "enabled publishing must use cloudflare-r2")?;
-            require(nonempty(&self.publishing.r2_bucket), "publishing.r2_bucket is required when publishing is enabled")?;
-            require(nonempty(&self.publishing.r2_prefix), "publishing.r2_prefix is required when publishing is enabled")?;
-            require(self.publishing.include_git_commit_sha, "publishing.include_git_commit_sha must be true")?;
-            require(self.publishing.publish_integrity_manifest, "publishing.publish_integrity_manifest must be true")?;
+            require(
+                self.publishing.provider == PublishingProvider::CloudflareR2,
+                "enabled publishing must use cloudflare-r2",
+            )?;
+            require(
+                nonempty(&self.publishing.r2_bucket),
+                "publishing.r2_bucket is required when publishing is enabled",
+            )?;
+            require(
+                nonempty(&self.publishing.r2_prefix),
+                "publishing.r2_prefix is required when publishing is enabled",
+            )?;
+            require(
+                self.publishing.include_git_commit_sha,
+                "publishing.include_git_commit_sha must be true",
+            )?;
+            require(
+                self.publishing.publish_integrity_manifest,
+                "publishing.publish_integrity_manifest must be true",
+            )?;
         }
 
-        let approved_schemes = self.security.secret_reference_schemes.iter().copied().collect::<BTreeSet<_>>();
+        let approved_schemes = self
+            .security
+            .secret_reference_schemes
+            .iter()
+            .copied()
+            .collect::<BTreeSet<_>>();
         let mut ids = BTreeSet::new();
         for service in &self.services {
-            require(!service.id.trim().is_empty(), "service id must not be empty")?;
-            require(ids.insert(service.id.as_str()), "service ids must be unique")?;
+            require(
+                !service.id.trim().is_empty(),
+                "service id must not be empty",
+            )?;
+            require(
+                ids.insert(service.id.as_str()),
+                "service ids must be unique",
+            )?;
             require(service.read_only, "every service must set read_only=true")?;
             if service.enabled {
-                require(!service.auth_refs.is_empty(), "enabled services must declare auth_refs")?;
-                require(!service.collect.is_empty(), "enabled services must declare a read-only collection scope")?;
+                require(
+                    !service.auth_refs.is_empty(),
+                    "enabled services must declare auth_refs",
+                )?;
+                require(
+                    !service.collect.is_empty(),
+                    "enabled services must declare a read-only collection scope",
+                )?;
             }
             for reference in &service.auth_refs {
                 validate_secret_ref(reference, &approved_schemes)?;
@@ -494,21 +572,38 @@ impl CanonicalAuditConfig {
                 if absent {
                     missing.push(MissingConfigField {
                         path: format!("services.{}.settings.{field}", service.id),
-                        reason: format!("required for enabled {:?} audit collection", service.provider).to_ascii_lowercase(),
+                        reason: format!(
+                            "required for enabled {:?} audit collection",
+                            service.provider
+                        )
+                        .to_ascii_lowercase(),
                     });
                 }
             };
             match service.provider {
-                ServiceProvider::Github | ServiceProvider::Sentry => push("organization", blank(&service.settings.organization)),
-                ServiceProvider::Aws | ServiceProvider::Cloudflare => push("account_id", blank(&service.settings.account_id)),
-                ServiceProvider::Gcp | ServiceProvider::Neondb => push("project_ids", empty_vec(&service.settings.project_ids)),
+                ServiceProvider::Github | ServiceProvider::Sentry => {
+                    push("organization", blank(&service.settings.organization))
+                }
+                ServiceProvider::Aws | ServiceProvider::Cloudflare => {
+                    push("account_id", blank(&service.settings.account_id))
+                }
+                ServiceProvider::Gcp | ServiceProvider::Neondb => {
+                    push("project_ids", empty_vec(&service.settings.project_ids))
+                }
                 ServiceProvider::Azure => {
                     push("tenant_id", blank(&service.settings.tenant_id));
-                    push("subscription_ids", empty_vec(&service.settings.subscription_ids));
+                    push(
+                        "subscription_ids",
+                        empty_vec(&service.settings.subscription_ids),
+                    );
                 }
-                ServiceProvider::Supabase => push("project_refs", empty_vec(&service.settings.project_refs)),
+                ServiceProvider::Supabase => {
+                    push("project_refs", empty_vec(&service.settings.project_refs))
+                }
                 ServiceProvider::Vercel => push("team_id", blank(&service.settings.team_id)),
-                ServiceProvider::Kubernetes => push("contexts", empty_vec(&service.settings.contexts)),
+                ServiceProvider::Kubernetes => {
+                    push("contexts", empty_vec(&service.settings.contexts))
+                }
                 ServiceProvider::Datadog => push("site", blank(&service.settings.site)),
                 ServiceProvider::Upstash | ServiceProvider::Other => {}
             }
@@ -534,12 +629,19 @@ impl CanonicalAuditConfig {
     /// Returns an error if serialization fails.
     pub fn redacted_json(&self) -> Result<serde_json::Value, AuditError> {
         let mut value = serde_json::to_value(self)?;
-        if let Some(services) = value.get_mut("services").and_then(serde_json::Value::as_array_mut) {
+        if let Some(services) = value
+            .get_mut("services")
+            .and_then(serde_json::Value::as_array_mut)
+        {
             for service in services {
-                if let Some(refs) = service.get_mut("auth_refs").and_then(serde_json::Value::as_array_mut) {
+                if let Some(refs) = service
+                    .get_mut("auth_refs")
+                    .and_then(serde_json::Value::as_array_mut)
+                {
                     for reference in refs {
                         if let Some(text) = reference.as_str() {
-                            let scheme = text.split_once(':').map_or("secret", |(prefix, _)| prefix);
+                            let scheme =
+                                text.split_once(':').map_or("secret", |(prefix, _)| prefix);
                             *reference = serde_json::Value::String(format!("{scheme}:<redacted>"));
                         }
                     }
@@ -565,26 +667,41 @@ fn redact_strings(value: &mut serde_json::Value) {
     }
 }
 
-fn validate_secret_ref(reference: &str, approved: &BTreeSet<SecretReferenceScheme>) -> Result<(), AuditError> {
+fn validate_secret_ref(
+    reference: &str,
+    approved: &BTreeSet<SecretReferenceScheme>,
+) -> Result<(), AuditError> {
     let scheme = approved
         .iter()
         .copied()
         .find(|scheme| reference.starts_with(scheme.prefix()))
         .ok_or_else(|| invalid("secret reference uses an unapproved scheme"))?;
     let target = reference.strip_prefix(scheme.prefix()).unwrap_or_default();
-    require(!target.trim().is_empty(), "secret reference target must not be empty")
+    require(
+        !target.trim().is_empty(),
+        "secret reference target must not be empty",
+    )
 }
 
 fn require(condition: bool, reason: &'static str) -> Result<(), AuditError> {
-    if condition { Ok(()) } else { Err(invalid(reason)) }
+    if condition {
+        Ok(())
+    } else {
+        Err(invalid(reason))
+    }
 }
 
 fn invalid(reason: impl Into<String>) -> AuditError {
-    AuditError::Invalid { field: "canonical-cfg", reason: reason.into() }
+    AuditError::Invalid {
+        field: "canonical-cfg",
+        reason: reason.into(),
+    }
 }
 
 fn nonempty(value: &Option<String>) -> bool {
-    value.as_deref().is_some_and(|value| !value.trim().is_empty())
+    value
+        .as_deref()
+        .is_some_and(|value| !value.trim().is_empty())
 }
 
 fn blank(value: &Option<String>) -> bool {
@@ -694,7 +811,10 @@ sign_manifest = true
 
     #[test]
     fn plaintext_secret_field_is_rejected_by_shape() {
-        let input = VALID.replace("organization = \"canonical-cloud\"", "organization = \"canonical-cloud\"\ntoken = \"secret\"");
+        let input = VALID.replace(
+            "organization = \"canonical-cloud\"",
+            "organization = \"canonical-cloud\"\ntoken = \"secret\"",
+        );
         assert!(toml::from_str::<CanonicalAuditConfig>(&input).is_err());
     }
 
@@ -717,7 +837,8 @@ collect = []
     #[test]
     fn redaction_removes_reference_targets() {
         let config = parse(VALID).expect("valid config");
-        let rendered = serde_json::to_string(&config.redacted_json().expect("redacted")).expect("json");
+        let rendered =
+            serde_json::to_string(&config.redacted_json().expect("redacted")).expect("json");
         assert!(!rendered.contains("GITHUB_TOKEN"));
         assert!(rendered.contains("env:<redacted>"));
         assert_eq!(config.redacted_digest().expect("digest").len(), 64);
