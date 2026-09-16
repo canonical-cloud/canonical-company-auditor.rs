@@ -891,7 +891,10 @@ sign_manifest = true
 
     #[test]
     fn stale_validator_revision_is_rejected() {
-        let input = VALID.replace(VALIDATOR_REVISION, "0000000000000000000000000000000000000000");
+        let input = VALID.replace(
+            VALIDATOR_REVISION,
+            "0000000000000000000000000000000000000000",
+        );
         assert!(parse(&input).is_err());
     }
 
