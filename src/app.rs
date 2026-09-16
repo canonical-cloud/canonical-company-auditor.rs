@@ -113,16 +113,11 @@ fn config(arguments: &ConfigArgs) -> Result<Exit, AuditError> {
     }))?;
     write_output("-", &format!("{output}\n"))?;
 
-    if valid {
-        Ok(Exit::Success)
-    } else if mode == InteractionMode::NonInteractive && config.interaction.fail_on_missing_required
-    {
-        Ok(Exit::FindingThreshold)
-    } else if prompt_required && config.interaction.prompt_for_missing {
-        Ok(Exit::FindingThreshold)
+    Ok(if valid {
+        Exit::Success
     } else {
-        Ok(Exit::FindingThreshold)
-    }
+        Exit::FindingThreshold
+    })
 }
 
 fn catalog(arguments: &CatalogArgs) -> Result<Exit, AuditError> {
