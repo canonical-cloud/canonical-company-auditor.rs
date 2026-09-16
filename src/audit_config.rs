@@ -17,6 +17,12 @@ use crate::AuditError;
 const MAX_CONFIG_BYTES: u64 = 1024 * 1024;
 const SCHEMA_VERSION: &str = "canonical.audit-config.v1";
 const CUSTOMER_DIR: &str = "customer";
+const CANONICAL_CLI_VERSION: &str = "0.1.0";
+const VALIDATOR_ID: &str = "oresoftware/typespec-json-schema-validator";
+const VALIDATOR_REVISION: &str = "7b1e79a32b89006a6eb6642ccd71ef25ffac0103";
+const VALIDATOR_RECEIPT_SCHEMA: &str = "ores.tjsv.config-instance/v1";
+const CONFIG_BRIDGE_ID: &str = "oresoftware/ores-cli";
+const CONFIG_BRIDGE_REVISION: &str = "f07b3785a6cd1957591104d19099724452058172";
 
 /// Admitted audit configuration consumed from `.canonical-cfg.toml`.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -24,6 +30,8 @@ const CUSTOMER_DIR: &str = "customer";
 pub struct CanonicalAuditConfig {
     /// Portable schema identifier.
     pub schema_version: String,
+    /// Exact toolchain provenance expected by the admitted v1 document.
+    pub toolchain: ToolchainPolicy,
     /// Stable customer/engagement identifier.
     pub customer_id: String,
     /// Human-readable customer name.
@@ -53,6 +61,28 @@ pub struct CanonicalAuditConfig {
     /// Optional secret-source references.
     #[serde(default)]
     pub secret_sources: Option<SecretSources>,
+}
+
+/// Toolchain provenance carried by every v1 Canonical audit config.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ToolchainPolicy {
+    /// Exact Canonical CLI version expected by the file.
+    pub canonical_cli: String,
+    /// Shared schema evaluator identity.
+    pub validator: String,
+    /// Immutable TJSV source revision.
+    pub validator_revision: String,
+    /// Structured validator receipt protocol.
+    pub validator_receipt_schema: String,
+    /// Shared native TOML/JSON bridge identity.
+    pub config_bridge: String,
+    /// Immutable `ores-config-shape` source revision.
+    pub config_bridge_revision: String,
+    /// v1 requires exact Canonical CLI compatibility.
+    pub require_exact_cli_version: bool,
+    /// Runtime schema observation is warning-only.
+    pub runtime_schema_drift: String,
 }
 
 /// Supported environment labels.
@@ -427,16 +457,56 @@ impl CanonicalAuditConfig {
         Ok(config)
     }
 
-    /// Applies security, repository-boundary, and provider-inventory invariants.
+    /// Applies security, repository-boundary, toolchain, and provider-inventory invariants.
     ///
     /// # Errors
     ///
     /// Fails closed when an audit configuration could mutate customer state, expose secrets,
-    /// or publish outside the customer allowlist.
+    /// use an unrecognized validation toolchain, or publish outside the customer allowlist.
     pub fn validate(&self) -> Result<(), AuditError> {
         require(
             self.schema_version == SCHEMA_VERSION,
             "schema_version must be canonical.audit-config.v1",
+        )?;
+        require(
+            self.toolchain.canonical_cli == CANONICAL_CLI_VERSION,
+            "toolchain.canonical_cli must match the admitted Canonical CLI version",
+        )?;
+        require(
+            self.toolchain.validator == VALIDATOR_ID,
+            "toolchain.validator must use the admitted TJSV validator",
+        )?;
+        require(
+            self.toolchain.validator_revision == VALIDATOR_REVISION,
+            "toolchain.validator_revision must match the admitted TJSV revision",
+        )?;
+        require(
+            self.toolchain.validator_receipt_schema == VALIDATOR_RECEIPT_SCHEMA,
+            "toolchain.validator_receipt_schema must use the admitted receipt protocol",
+        )?;
+        require(
+            self.toolchain.config_bridge == CONFIG_BRIDGE_ID,
+            "toolchain.config_bridge must use the admitted ores-cli bridge",
+        )?;
+        require(
+            self.toolchain.config_bridge_revision == CONFIG_BRIDGE_REVISION,
+            "toolchain.config_bridge_revision must match the admitted ores-cli revision",
+        )?;
+        require(
+            self.toolchain.require_exact_cli_version,
+            "toolchain.require_exact_cli_version must be true",
+        )?;
+        require(
+            self.toolchain.runtime_schema_drift == "warn",
+            "toolchain.runtime_schema_drift must be warn",
+        )?;
+        require(
+            is_lower_hex_revision(&self.toolchain.validator_revision),
+            "toolchain.validator_revision must be a lowercase 40-hex revision",
+        )?;
+        require(
+            is_lower_hex_revision(&self.toolchain.config_bridge_revision),
+            "toolchain.config_bridge_revision must be a lowercase 40-hex revision",
         )?;
         require(
             !self.customer_id.trim().is_empty(),
@@ -488,7 +558,7 @@ impl CanonicalAuditConfig {
             "publishing.source_dir must be customer",
         )?;
         require(
-            self.git.commit_raw_secrets == false,
+            !self.git.commit_raw_secrets,
             "git.commit_raw_secrets must be false",
         )?;
         require(
@@ -683,6 +753,13 @@ fn validate_secret_ref(
     )
 }
 
+fn is_lower_hex_revision(value: &str) -> bool {
+    value.len() == 40
+        && value
+            .bytes()
+            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+}
+
 fn require(condition: bool, reason: &'static str) -> Result<(), AuditError> {
     if condition {
         Ok(())
@@ -722,6 +799,15 @@ customer_id = "demo"
 display_name = "Demo"
 environment = "test"
 audit_mode = "read-only"
+[toolchain]
+canonical_cli = "0.1.0"
+validator = "oresoftware/typespec-json-schema-validator"
+validator_revision = "7b1e79a32b89006a6eb6642ccd71ef25ffac0103"
+validator_receipt_schema = "ores.tjsv.config-instance/v1"
+config_bridge = "oresoftware/ores-cli"
+config_bridge_revision = "f07b3785a6cd1957591104d19099724452058172"
+require_exact_cli_version = true
+runtime_schema_drift = "warn"
 [frameworks]
 soc2 = true
 nist_csf_2_0 = true
@@ -800,6 +886,18 @@ sign_manifest = true
     #[test]
     fn mutation_is_rejected() {
         let input = VALID.replace("allow_mutations = false", "allow_mutations = true");
+        assert!(parse(&input).is_err());
+    }
+
+    #[test]
+    fn stale_validator_revision_is_rejected() {
+        let input = VALID.replace(VALIDATOR_REVISION, "0000000000000000000000000000000000000000");
+        assert!(parse(&input).is_err());
+    }
+
+    #[test]
+    fn wrong_config_bridge_is_rejected() {
+        let input = VALID.replace(CONFIG_BRIDGE_ID, "example/config-bridge");
         assert!(parse(&input).is_err());
     }
 
