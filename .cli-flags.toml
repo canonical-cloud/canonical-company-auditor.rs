@@ -24,6 +24,34 @@ short = "V"
 type = "bool"
 help = "Print the canonical-auditor version."
 
+[commands.config]
+help = "Validate or safely display the authoritative .canonical-cfg.toml consumer projection."
+
+[commands.config.flags.file]
+env = "CANONICAL_AUDITOR_CONFIG_FILE"
+aliases = ["file"]
+type = "string"
+default = ".canonical-cfg.toml"
+help = "Canonical audit config TOML path."
+
+[commands.config.flags.show]
+env = "CANONICAL_AUDITOR_CONFIG_SHOW"
+aliases = ["show"]
+type = "bool"
+help = "Emit a redacted config projection after validation."
+
+[commands.config.flags.interactive]
+env = "CANONICAL_AUDITOR_CONFIG_INTERACTIVE"
+aliases = ["interactive"]
+type = "bool"
+help = "Explicitly permit interactive missing-input handling by a caller."
+
+[commands.config.flags.non-interactive]
+env = "CANONICAL_AUDITOR_CONFIG_NON_INTERACTIVE"
+aliases = ["non-interactive"]
+type = "bool"
+help = "Never prompt; fail with a structured missing-field list."
+
 [commands.catalog]
 help = "Inspect reviewed framework metadata and rule coverage."
 
