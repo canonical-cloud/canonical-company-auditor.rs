@@ -1,0 +1,30 @@
+name: bounded formal audit model
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  model-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Prove compliance cannot precede required evidence
+        run: |
+          node <<'NODE'
+          const assert=require('node:assert/strict'), bound=7;
+          const initial={a:false,b:false,failed:false,compliant:false};
+          const steps=[
+            ['pass-a',s=>({...s,a:true})],
+            ['pass-b',s=>({...s,b:true})],
+            ['fail',s=>({...s,failed:true,compliant:false})],
+            ['attest',s=>({...s,compliant:!s.failed&&s.a&&s.b})]
+          ];
+          const invariant=s=>!s.compliant||(!s.failed&&s.a&&s.b);
+          let frontier=[initial],seen=new Map([[JSON.stringify(initial),initial]]);
+          for(let d=0;d<=bound;d++){const next=[];for(const s of frontier){assert(invariant(s));for(const [name,step] of steps){const n=step(structuredClone(s));assert(invariant(n),`${name} violated audit invariant`);const k=JSON.stringify(n);if(!seen.has(k)){seen.set(k,n);next.push(n)}}}frontier=next}
+          assert(seen.size>=3); console.log(`audit formal model OK: states=${seen.size} bound=${bound}`);
+          NODE
