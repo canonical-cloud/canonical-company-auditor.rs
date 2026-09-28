@@ -3,6 +3,7 @@
 //! The engine separates framework-neutral observations from framework overlays and keeps
 //! AI-assisted narrative generation outside the evidence and decision boundary.
 
+pub mod agent_eval_evidence;
 pub mod app;
 pub mod audit;
 // This is a handwritten consuming projection of the admitted external audit-config contract.
