@@ -1,0 +1,117 @@
+name: ores-comparisons-pr80-external
+
+on:
+  push:
+    branches:
+      - test/ores-comparisons-pr80-external-20260930
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ores-comparisons-pr80-external-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  faas-static-controller:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: ORESoftware/ores-comparisons
+          ref: 60303ccd44c2639b892b920ec2dfd40f07f59639
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+      - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable
+        with:
+          toolchain: "1.88"
+          components: rustfmt
+      - name: Validate FaaS catalog, fleet proof, public static gates, and controller
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p tmp artifacts
+          python3 scripts/verify_workflow_pins.py
+          python3 scripts/verify_private_authority_credentials.py
+          python3 scripts/verify_project_matrix.py
+          rustfmt --edition 2024 --check tools/verify_stack_catalog.rs tools/json_value.rs
+          rustc --edition 2024 --test tools/verify_stack_catalog.rs -o tmp/verify-stack-catalog-tests
+          ./tmp/verify-stack-catalog-tests
+          rustc --edition 2024 tools/verify_stack_catalog.rs -o tmp/verify-stack-catalog
+          ./tmp/verify-stack-catalog
+          python3 scripts/verify_dummy_org_map.py
+          python3 scripts/verify_dummy_org_gitlinks.py
+          python3 scripts/verify_project_repo_layout.py
+          python3 scripts/materialize_dummy_orgs.py
+          python3 scripts/verify_toolchain_pins.py
+          python3 scripts/verify_adversarial_fixtures.py
+          rustfmt --edition 2024 --check tools/fleet_proof.rs
+          rustc --edition 2024 --test tools/fleet_proof.rs -o tmp/fleet-proof-tests
+          ./tmp/fleet-proof-tests
+          rustc --edition 2024 tools/fleet_proof.rs -o tmp/fleet-proof
+          ./tmp/fleet-proof > artifacts/fleet-proof.json
+          python3 scripts/verify_ores_stack_cli_hardening.py
+          python3 scripts/verify_server_compatibility.py
+          python3 scripts/verify_server_startup_policy.py
+          python3 -m unittest tests.test_server_compatibility tests.test_server_startup_policy
+          python3 scripts/verify_ores_stack_cli_integrity.py
+          python3 scripts/verify_ores_stack_cli_release_safety.py
+          python3 scripts/generate_ores_stack_server_inventory.py --check
+          python3 scripts/verify_real_server_inventory.py
+          python3 -m unittest tests.test_adversarial_fixtures tests.test_ores_stack_cli_hardening tests.test_ores_stack_cli_integrity tests.test_ores_stack_cli_release_safety tests.test_ores_stack_clean_machine tests.test_ores_stack_toolchain_switch
+          python3 scripts/verify_benchmark_matrix.py
+          python3 -m py_compile scripts/prove_runtime_project.py
+          python3 -m unittest tests.test_runtime_proof tests.test_runtime_workflow_source_binding
+          rustfmt --edition 2024 --check tools/private_repo_read_access.rs tools/json_value.rs tools/runtime_receipt_set.rs
+          rustc --edition 2024 --test tools/private_repo_read_access.rs -o tmp/private-repo-read-access-tests
+          ./tmp/private-repo-read-access-tests
+          rustc --edition 2024 --test tools/runtime_receipt_set.rs -o tmp/runtime-receipt-set-tests
+          ./tmp/runtime-receipt-set-tests
+      - name: Prove exact eight-platform FaaS cohort
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          c = json.load(open('shared/stack-catalog.json'))
+          cohort = c['faas_coverage']
+          ids = [p['id'] for p in cohort['platforms']]
+          expected = {'scintilla-run','iso-lattes','lunatic-lorry','wasm-xprs','litegraph','beamscale','graal-vm','pony-expres'}
+          assert cohort['minimum_platforms'] >= 7
+          assert set(ids) == expected, (ids, expected)
+          assert len(ids) == len(set(ids)) == 8
+          mapping = {p['id']: p['stack_id'] for p in cohort['platforms']}
+          assert mapping['graal-vm'] == 'graal-show'
+          assert len(set(mapping.values())) == 8
+          print('external FaaS cohort proof OK: 8 distinct platforms, floor >= 7')
+          PY
+      - name: Exercise benchmark recorder
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 18765 --bind 127.0.0.1 >/tmp/ores-comparisons-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" >/dev/null 2>&1 || true' EXIT
+          for _ in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:18765/ >/dev/null; then break; fi
+            sleep 0.1
+          done
+          python3 scripts/run_benchmark.py --stack beamscale --scenario http-observability --url http://127.0.0.1:18765/ --requests 5 --warmup 1 --pid "$server_pid" --artifact README.md --cost-per-million-usd 0.125 --output benchmarks/results/benchmark-external-ci.json
+          python3 scripts/render_benchmark_matrix.py --output benchmarks/results/matrix-external-ci.md
+          grep -q "http-observability" benchmarks/results/matrix-external-ci.md
+          rm -f benchmarks/results/benchmark-external-ci.json benchmarks/results/matrix-external-ci.md
+      - name: Verify backward compatibility against PR base
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest -v tests.test_contract_compatibility
+          python3 scripts/verify_contract_compatibility.py --base-ref 25d53f834a9e2bcde4e8593f4beefc61e48894e6 --receipt artifacts/contract-compatibility-external.json
+
+  runtime-all-18-fail-closed-boundary:
+    uses: ORESoftware/ores-comparisons/.github/workflows/runtime-all-18.yml@60303ccd44c2639b892b920ec2dfd40f07f59639
