@@ -163,9 +163,7 @@ pub fn agent_eval_receipt_to_evidence(
     {
         return Err(invalid(
             "agentEvalFreshness",
-            format!(
-                "requires collectedAt >= 0 and validForSeconds in 1..={MAX_VALIDITY_SECONDS}"
-            ),
+            format!("requires collectedAt >= 0 and validForSeconds in 1..={MAX_VALIDITY_SECONDS}"),
         ));
     }
     let valid_until = context
@@ -181,12 +179,7 @@ pub fn agent_eval_receipt_to_evidence(
         adapter_version: context.adapter_version.to_owned(),
     };
     let mut observations = Vec::with_capacity(receipt.case_results.len() + 1);
-    observations.push(run_observation(
-        context,
-        valid_until,
-        &source,
-        &receipt,
-    )?);
+    observations.push(run_observation(context, valid_until, &source, &receipt)?);
     for result in &receipt.case_results {
         observations.push(case_observation(
             context,
@@ -216,7 +209,9 @@ fn validate_receipt(
         return Err(invalid("agentEvalKind", "must be evaluation_receipt"));
     }
     if receipt.schema_version != RECEIPT_SCHEMA {
-        return Err(AuditError::UnsupportedVersion(receipt.schema_version.clone()));
+        return Err(AuditError::UnsupportedVersion(
+            receipt.schema_version.clone(),
+        ));
     }
     if receipt.repository != context.expected_repository {
         return Err(invalid(
@@ -662,7 +657,10 @@ mod tests {
             .filter_map(|observation| observation.facts.get("status"))
             .filter_map(serde_json::Value::as_str)
             .collect::<BTreeSet<_>>();
-        assert_eq!(statuses, BTreeSet::from(["passed", "infra_failed", "skipped"]));
+        assert_eq!(
+            statuses,
+            BTreeSet::from(["passed", "infra_failed", "skipped"])
+        );
         Ok(())
     }
 
@@ -682,7 +680,8 @@ mod tests {
     #[test]
     fn rejects_modified_receipt_digest() -> Result<(), AuditError> {
         let bytes = valid_receipt()?;
-        let text = String::from_utf8(bytes).map_err(|error| invalid("testFixture", error.to_string()))?;
+        let text =
+            String::from_utf8(bytes).map_err(|error| invalid("testFixture", error.to_string()))?;
         let modified = text.replace("fixture-provider", "different-provider");
         assert!(matches!(
             agent_eval_receipt_to_evidence(context(), modified.as_bytes()),
@@ -694,8 +693,12 @@ mod tests {
     #[test]
     fn rejects_denominator_or_coverage_rewriting() -> Result<(), AuditError> {
         let bytes = valid_receipt()?;
-        let text = String::from_utf8(bytes).map_err(|error| invalid("testFixture", error.to_string()))?;
-        let modified = text.replace("\"non_passing_case_count\":2", "\"non_passing_case_count\":0");
+        let text =
+            String::from_utf8(bytes).map_err(|error| invalid("testFixture", error.to_string()))?;
+        let modified = text.replace(
+            "\"non_passing_case_count\":2",
+            "\"non_passing_case_count\":0",
+        );
         assert!(agent_eval_receipt_to_evidence(context(), modified.as_bytes()).is_err());
         Ok(())
     }
