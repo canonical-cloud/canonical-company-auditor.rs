@@ -106,7 +106,7 @@ impl AgentEvalCaseStatus {
     }
 
     fn counts_as_executed(self) -> bool {
-        return !matches!(self, Self::Skipped | Self::InvalidCase);
+        !matches!(self, Self::Skipped | Self::InvalidCase)
     }
 }
 
@@ -163,9 +163,7 @@ pub fn agent_eval_receipt_to_evidence(
     {
         return Err(invalid(
             "agentEvalFreshness",
-            format!(
-                "requires collectedAt >= 0 and validForSeconds in 1..={MAX_VALIDITY_SECONDS}"
-            ),
+            format!("requires collectedAt >= 0 and validForSeconds in 1..={MAX_VALIDITY_SECONDS}"),
         ));
     }
     let valid_until = context
@@ -181,12 +179,7 @@ pub fn agent_eval_receipt_to_evidence(
         adapter_version: context.adapter_version.to_owned(),
     };
     let mut observations = Vec::with_capacity(receipt.case_results.len() + 1);
-    observations.push(run_observation(
-        context,
-        valid_until,
-        &source,
-        &receipt,
-    )?);
+    observations.push(run_observation(context, valid_until, &source, &receipt)?);
     for result in &receipt.case_results {
         observations.push(case_observation(
             context,
@@ -205,7 +198,7 @@ pub fn agent_eval_receipt_to_evidence(
     };
     bundle.validate()?;
 
-    return Ok(bundle);
+    Ok(bundle)
 }
 
 fn validate_receipt(
@@ -216,7 +209,9 @@ fn validate_receipt(
         return Err(invalid("agentEvalKind", "must be evaluation_receipt"));
     }
     if receipt.schema_version != RECEIPT_SCHEMA {
-        return Err(AuditError::UnsupportedVersion(receipt.schema_version.clone()));
+        return Err(AuditError::UnsupportedVersion(
+            receipt.schema_version.clone(),
+        ));
     }
     if receipt.repository != context.expected_repository {
         return Err(invalid(
@@ -307,7 +302,7 @@ fn validate_receipt(
         return Err(AuditError::Integrity);
     }
 
-    return Ok(());
+    Ok(())
 }
 
 fn validate_case_result(result: &AgentEvalCaseResult) -> Result<(), AuditError> {
@@ -327,7 +322,7 @@ fn validate_case_result(result: &AgentEvalCaseResult) -> Result<(), AuditError> 
         ));
     }
 
-    return Ok(());
+    Ok(())
 }
 
 fn run_observation(
@@ -391,7 +386,7 @@ fn run_observation(
         ("receiptSha256".to_owned(), json!(receipt.receipt_sha256)),
     ]);
 
-    return Ok(EvidenceObservation {
+    Ok(EvidenceObservation {
         external_id,
         evidence_type: "agent_eval.run".to_owned(),
         subject: context.scope_id.to_owned(),
@@ -400,7 +395,7 @@ fn run_observation(
         valid_until,
         facts,
         attestation: None,
-    });
+    })
 }
 
 fn case_observation(
@@ -453,7 +448,7 @@ fn case_observation(
         );
     }
 
-    return Ok(EvidenceObservation {
+    Ok(EvidenceObservation {
         external_id,
         evidence_type: "agent_eval.case".to_owned(),
         subject: context.scope_id.to_owned(),
@@ -462,7 +457,7 @@ fn case_observation(
         valid_until,
         facts,
         attestation: None,
-    });
+    })
 }
 
 fn receipt_payload_sha256(receipt: &AgentEvalReceipt) -> Result<String, AuditError> {
@@ -494,7 +489,7 @@ fn receipt_payload_sha256(receipt: &AgentEvalReceipt) -> Result<String, AuditErr
         return Err(AuditError::Integrity);
     };
 
-    return Ok(raw.to_owned());
+    Ok(raw.to_owned())
 }
 
 fn validate_repository(value: &str) -> Result<(), AuditError> {
@@ -511,15 +506,15 @@ fn validate_repository(value: &str) -> Result<(), AuditError> {
         ));
     }
 
-    return Ok(());
+    Ok(())
 }
 
 fn safe_repo_segment(value: &str) -> bool {
-    return !value.is_empty()
+    !value.is_empty()
         && value.len() <= 128
         && value
             .bytes()
-            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'.' | b'_' | b'-'));
+            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'.' | b'_' | b'-'))
 }
 
 fn validate_git_sha(field: &'static str, value: &str) -> Result<(), AuditError> {
@@ -527,7 +522,7 @@ fn validate_git_sha(field: &'static str, value: &str) -> Result<(), AuditError> 
         return Err(invalid(field, "must be a lowercase 40- or 64-hex Git SHA"));
     }
 
-    return Ok(());
+    Ok(())
 }
 
 fn validate_sha256(field: &'static str, value: &str) -> Result<(), AuditError> {
@@ -535,13 +530,13 @@ fn validate_sha256(field: &'static str, value: &str) -> Result<(), AuditError> {
         return Err(invalid(field, "must be a lowercase 64-hex SHA-256 digest"));
     }
 
-    return Ok(());
+    Ok(())
 }
 
 fn is_lower_hex(value: &str) -> bool {
-    return value
+    value
         .bytes()
-        .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte));
+        .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
 }
 
 fn validate_text(field: &'static str, value: &str) -> Result<(), AuditError> {
@@ -556,14 +551,14 @@ fn validate_text(field: &'static str, value: &str) -> Result<(), AuditError> {
         ));
     }
 
-    return Ok(());
+    Ok(())
 }
 
 fn invalid(field: &'static str, reason: impl Into<String>) -> AuditError {
-    return AuditError::Invalid {
+    AuditError::Invalid {
         field,
         reason: reason.into(),
-    };
+    }
 }
 
 #[cfg(test)]
@@ -634,11 +629,11 @@ mod tests {
         };
         receipt.receipt_sha256 = receipt_payload_sha256(&receipt)?;
 
-        return Ok(serde_json::to_vec(&receipt)?);
+        Ok(serde_json::to_vec(&receipt)?)
     }
 
     fn context<'a>() -> AgentEvalEvidenceContext<'a> {
-        return AgentEvalEvidenceContext {
+        AgentEvalEvidenceContext {
             tenant_id: "tenant-a",
             scope_id: "organization/acme/system/qa",
             expected_repository: "elenkos-systems/elenkos-e2e",
@@ -646,7 +641,7 @@ mod tests {
             collected_at: 1_700_000_000,
             valid_for_seconds: 3_600,
             adapter_version: "canonical-agent-eval-v1",
-        };
+        }
     }
 
     #[test]
@@ -662,7 +657,10 @@ mod tests {
             .filter_map(|observation| observation.facts.get("status"))
             .filter_map(serde_json::Value::as_str)
             .collect::<BTreeSet<_>>();
-        assert_eq!(statuses, BTreeSet::from(["passed", "infra_failed", "skipped"]));
+        assert_eq!(
+            statuses,
+            BTreeSet::from(["passed", "infra_failed", "skipped"])
+        );
         Ok(())
     }
 
@@ -682,7 +680,8 @@ mod tests {
     #[test]
     fn rejects_modified_receipt_digest() -> Result<(), AuditError> {
         let bytes = valid_receipt()?;
-        let text = String::from_utf8(bytes).map_err(|error| invalid("testFixture", error.to_string()))?;
+        let text =
+            String::from_utf8(bytes).map_err(|error| invalid("testFixture", error.to_string()))?;
         let modified = text.replace("fixture-provider", "different-provider");
         assert!(matches!(
             agent_eval_receipt_to_evidence(context(), modified.as_bytes()),
@@ -694,8 +693,12 @@ mod tests {
     #[test]
     fn rejects_denominator_or_coverage_rewriting() -> Result<(), AuditError> {
         let bytes = valid_receipt()?;
-        let text = String::from_utf8(bytes).map_err(|error| invalid("testFixture", error.to_string()))?;
-        let modified = text.replace("\"non_passing_case_count\":2", "\"non_passing_case_count\":0");
+        let text =
+            String::from_utf8(bytes).map_err(|error| invalid("testFixture", error.to_string()))?;
+        let modified = text.replace(
+            "\"non_passing_case_count\":2",
+            "\"non_passing_case_count\":0",
+        );
         assert!(agent_eval_receipt_to_evidence(context(), modified.as_bytes()).is_err());
         Ok(())
     }
